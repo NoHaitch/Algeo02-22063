@@ -49,6 +49,9 @@
 - [Link Q&A](https://docs.google.com/spreadsheets/d/18SK0y6rL9ZQtNMRR83Vy-Z3VtycjyJQj6rhDf1633qM/edit#gid=0)
 - [Link Data Kelompok](https://docs.google.com/spreadsheets/d/18SK0y6rL9ZQtNMRR83Vy-Z3VtycjyJQj6rhDf1633qM/edit#gid=1688564596)
 
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
 
 
 <!-- GENERAL INFORMATION -->
@@ -59,6 +62,9 @@
 - Why did you undertake it?
 <!-- You don't have to answer all the questions - just the ones relevant to your project. -->
 
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
 
 
 <!-- TECHNOLOGIES USED -->
@@ -66,6 +72,9 @@
 - Tech 1 - version 1.0
 - Tech 2 - version 2.0
 - Tech 3 - version 3.0
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
 
 
 
@@ -76,12 +85,18 @@ List the ready features here:
 - Awesome feature 2
 - Awesome feature 3
 
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
 
 
 <!-- SCREEENSHOTS -->
 ## Screenshots
 ![Example screenshot](./img/screenshot.png)
 <!-- If you have screenshots you'd like to share, include them here. -->
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
 
 
 
@@ -90,6 +105,8 @@ List the ready features here:
 What are the project requirements/dependencies? Where are they listed? A requirements.txt or a Pipfile.lock file perhaps? Where is it located?
 
 Proceed to describe how to install / setup one's local environment / get started with the project.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 
@@ -100,11 +117,15 @@ Provide various use cases and code examples here.
 
 `write-your-code-here`
 
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
 
 
 <!-- PROJECT STATUS -->
 ## Project Status
 Project is: _in progress_
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 
@@ -118,6 +139,9 @@ Room for improvement:
 To do:
 - Feature to be added 1
 - Feature to be added 2
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
 
 
 <!-- CONTRIBUTING -->
