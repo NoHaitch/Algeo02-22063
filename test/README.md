@@ -1,0 +1,1 @@
+# Berisi Gambar Masukan untuk Pengujian
