@@ -7,7 +7,7 @@
   <h1 align="center">Tugas Besar IF2110 Algoritma & Struktur Data ITB</h1>
 
   <p align="center">
-    <h3>Sistem Temu Balik Gambar (Image Retrieval System)</h3>
+    <h3>Content-Based Image Retrieval System (CBIR)</h3>
     <h3>Live Demo :</h3>
     <a href="#">www.Example.com</a>
     <br>
