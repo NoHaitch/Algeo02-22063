@@ -1,0 +1,24 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { 
+  --primary : #7203FF;  
+  --secondary : #F99C30;
+  --button-bg: #00926F;
+}
+
+body {
+  overflow:visible;
+  background-color: white;
+}
+
+img{
+  user-select: none;
+}
+
+.navbar{
+  background: linear-gradient(90deg, #7203FF 24.55%, #000000 96.98%);
+  background-clip: text;
+  color : transparent;
+}
