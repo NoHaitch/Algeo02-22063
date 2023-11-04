@@ -35,6 +35,5 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-
-src/temp
-img/*
+src/server/uploads/dataset/
+src/server/node_modules/
