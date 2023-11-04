@@ -10,14 +10,13 @@
 
 body {
   overflow:visible;
-  background-color: white;
 }
 
 img{
   user-select: none;
 }
 
-.navbar{
+.title{
   background: linear-gradient(90deg, #7203FF 24.55%, #000000 96.98%);
   background-clip: text;
   color : transparent;

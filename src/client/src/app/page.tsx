@@ -1,8 +1,9 @@
-import Navbar from "@/components/navbar";
-import Switch from "@/components/switch";
+import Navbar from "@/components/Navbar";
+import Switch from "@/components/Switch";
 import Image from "next/image";
+import Link from "next/link";
 
-export default async function Page() {
+export default function Home() {
   return (
     <>
       <Navbar />
@@ -20,11 +21,11 @@ export default async function Page() {
             </div>
             <button className="text-xl font-bold text-white p-2 pl-5 pr-5 bg-[--button-bg]  rounded-[20px] m-3">Search</button>
         </div>
-        <div className="flex">
+        <div className="">
           <Image
             src="/placeholder.jpg"
             width={640}
-            height={480}
+            height={400}
             alt="Picture of the author"
             className="rounded-[25px] drop-shadow-[10px_10px_5px_#000]"
           />

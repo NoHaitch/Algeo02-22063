@@ -1,11 +1,8 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
-
 export const metadata: Metadata = {
-  title: "Todo App",
+  title: "Image Retrieval System",
 };
 
 export default function RootLayout({
@@ -15,9 +12,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body
-        className={`${inter.className}  container mx-auto p-4 w-screen h-screen`}
-      >
+      <body className="container mx-auto p-5 w-screen h-screen">
         {children}
       </body>
     </html>
