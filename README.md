@@ -24,6 +24,33 @@
 </div>
 
 
+<!-- CONTRIBUTOR -->
+<div align="center" id="contributor">
+  <strong>
+    <h3>Dibuat oleh Kelompok 23 - Bjir Anak Nopal.</h3>
+    <table align="center">
+      <tr>
+        <td>NIM</td>
+        <td>Nama</td>
+      </tr>
+      <tr>
+        <td>13522063</td>
+        <td>Shazya Audrea Taufik</td>
+      </tr>
+      <tr>
+        <td>13522071</td>
+        <td>Bagas Sambega Rosyada</td>
+      </tr>
+      <tr>
+        <td>13522091</td>
+        <td>Raden Francisco Trianto Bratadiningrat</td>
+      </tr>
+    </table>
+  </strong>
+</div>
+
+
+
 <!-- TABLE OF CONTENTS -->
 <details>
   <summary>Table of Contents</summary>
@@ -66,15 +93,15 @@
 
 
 
-
 <!-- TECHNOLOGIES USED -->
 ## Technologies Used
-- Tech 1 - version 1.0
-- Tech 2 - version 2.0
-- Tech 3 - version 3.0
+- Nextjs 14.0.1
+- Framer-motion 10.16.4
+- Express 4.18.2
+- Cors 2.8.5
+- Multer 1.4.5-lts.1
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
-
 
 
 
@@ -89,14 +116,12 @@ List the ready features here:
 
 
 
-
 <!-- SCREEENSHOTS -->
 ## Screenshots
 ![Example screenshot](./img/screenshot.png)
 <!-- If you have screenshots you'd like to share, include them here. -->
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
-
 
 
 
