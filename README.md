@@ -95,11 +95,14 @@
 
 <!-- TECHNOLOGIES USED -->
 ## Technologies Used
-- Nextjs 14.0.1
-- Framer-motion 10.16.4
-- Express 4.18.2
-- Cors 2.8.5
-- Multer 1.4.5-lts.1
+### Front-End
+- [Nextjs](https://nextjs.org/) 14.0.1
+- [Tailwindcss](https://tailwindcss.com/) 3.3.5
+- [Framer-motion](https://www.framer.com/motion/) 10.16.4
+### Back-End
+- [Express](https://expressjs.com/) 4.18.2
+- [Cors](https://www.npmjs.com/package/cors) 2.8.5
+- [Multer](https://www.npmjs.com/package/multer) 1.4.5-lts.1
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
