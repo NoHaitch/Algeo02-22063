@@ -23,7 +23,7 @@ import { dirname } from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const storage = multer.diskStorage({
+const imgStorage = multer.diskStorage({
   destination: function (req, file, callback) {
     callback(null, path.join(__dirname, 'uploads'));
   },
@@ -31,14 +31,38 @@ const storage = multer.diskStorage({
     callback(null, file.originalname);
   }
 });
-// Set saved storage options:
-const upload = multer({ storage: storage })
 
-app.post("/api", upload.array("file"), (req, res) => {
+// Set saved storage options:
+const ImgUpload = multer({ storage: imgStorage })
+
+app.post("/api/upload-img", ImgUpload.array("file"), (req, res) => {
     // Sets multer to intercept files named "files" on uploaded form data
 
     console.log(req.body); // Logs form body values
     console.log(req.files); // Logs any files
-    res.json({ message: "File(s) uploaded successfully" });
+    res.json({ message: "File uploaded successfully" });
 
 });
+
+const dataStorage = multer.diskStorage({
+  destination: function (req, file, callback) {
+    callback(null, path.join(__dirname, 'uploads/dataset'));
+  },
+  filename: function (req, file, callback) {
+    callback(null, file.originalname);
+  }
+});
+
+// Set saved storage options:
+const dataUpload = multer({ storage: dataStorage })
+
+app.post("/api/upload-data", dataUpload.array("file"), (req, res) => {
+    // Sets multer to intercept files named "files" on uploaded form data
+
+    console.log(req.body); // Logs form body values
+    console.log(req.files); // Logs any files
+    res.json({ message: "File uploaded successfully" });
+
+});
+
+
