@@ -181,6 +181,8 @@ Permintaan Pull __sangat diperbolehkan dan diterima dengan hangat__.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
+## Special Thanks
+- [Semantic Commit Messages](https://gist.github.com/joshbuchea/6f47e86d2510bce28f8e7f42ae84c716) 
 
 
 <!-- LICENSE -->
