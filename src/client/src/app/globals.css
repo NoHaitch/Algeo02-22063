@@ -3,13 +3,15 @@
 @tailwind utilities;
 
 :root { 
-  --primary : #7203FF;  
-  --secondary : #F99C30;
+  --primary : #031CFF;  
+  --secondary : #0010A0;
+  --trinary : #0B124A;
   --button-bg: #00926F;
 }
 
 body {
   overflow:visible;
+  font-family: 'Rubik', sans-serif;   
 }
 
 img{
@@ -17,7 +19,11 @@ img{
 }
 
 .title{
-  background: linear-gradient(90deg, #7203FF 24.55%, #000000 96.98%);
+  background: linear-gradient(90deg, #031CFF 24.55%, #000000 96.98%);
   background-clip: text;
   color : transparent;
+}
+
+.navbar_button{
+  background: radial-gradient(220.45% 279.86% at 50% 98.86%, #031CFF 0%, rgba(114, 3, 255, 0) 100%) /* warning: gradient uses a rotation that is not supported by CSS and may not behave as expected */;
 }
