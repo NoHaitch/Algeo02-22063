@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "cd src/client && npm run dev",
-    "start": "node server"
+    "start": "cd src/server && npm run dev"
   },
   "dependencies": {
     "cors": "^2.8.5",
