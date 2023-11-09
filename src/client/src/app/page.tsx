@@ -56,7 +56,7 @@ export default function page() {
             </span>
           </Link>
           <Link
-            href="/introduction"
+            href="/app"
             className="mt-2 w-[180px] relative inline-flex items-center justify-start py-3 pl-4 pr-12 overflow-hidden font-semibold text-[--primary] transition-all duration-150 ease-in-out rounded hover:pl-10 hover:pr-6 bg-gray-50 group"
           >
             <span className="absolute bottom-0 left-0 w-full h-1 transition-all duration-150 ease-in-out bg-[--primary] group-hover:h-full"></span>

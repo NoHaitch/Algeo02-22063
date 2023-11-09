@@ -2,6 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import multer from 'multer';
 import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 
 const app = express();
 const PORT = 8080;
@@ -11,14 +13,11 @@ app.get("/api/home", (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`Server started on port ${PORT}`);
+  console.log(`Server started on port ${PORT}`);
 });
 
-app.use(cors()); // Allows incoming requests from any IP
-
-// Start by creating some disk storage options:
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
+// Allows incoming requests from any IP using cors
+app.use(cors()); 
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);

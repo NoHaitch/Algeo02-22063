@@ -30,6 +30,7 @@ export default function Home() {
 
       if (response.ok) {
         console.log(result); // Log the full response
+        alert("Image upload completed successfully");
       } else {
         // If the response is not OK, show an alert with the full response
         alert(`File is not an Image`);
@@ -44,7 +45,8 @@ export default function Home() {
   const handleFolderUpload = async () => {
     const folderInput = folderInputRef.current;
     const files = folderInput?.files;
-  
+    const startTime = new Date();
+
     if (!files || files.length === 0) {
       alert("Please select a folder");
       return;
@@ -82,7 +84,8 @@ export default function Home() {
     }
   
     if (!errorOccurred) {
-      alert("Folder upload completed successfully");
+      const endTime = new Date();
+      alert(`Folder upload completed successfully\nTime : ${(endTime.getTime() - startTime.getTime())/1000} second`);
     }
     else{
       alert("Folder upload failed, content of folder must all be an image")
