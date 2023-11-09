@@ -13,6 +13,7 @@ export default function AboutUs() {
             width={160}
             height={160}
             alt="phoenix logo"
+            className="about-us-logo"
           />
           <div className="font-bold text-center">
             <h1 className="text-3xl">PhoenixImage.</h1>
