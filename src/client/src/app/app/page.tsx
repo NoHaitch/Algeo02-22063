@@ -25,10 +25,19 @@ export default function Home() {
         method: "POST",
         body: formData,
       });
-      const result = await response.json();
-      console.log(result);
+
+      const result = await response.text(); // Get the full response as text
+
+      if (response.ok) {
+        console.log(result); // Log the full response
+      } else {
+        // If the response is not OK, show an alert with the full response
+        alert(`File is not an Image`);
+      }
     } catch (error) {
-      console.error("Error uploading file:", error);
+      alert(
+        "An error occurred during file upload. Please check the console for more details."
+      );
     }
   };
 
@@ -41,6 +50,8 @@ export default function Home() {
       return;
     }
   
+    let errorOccurred = false; // Track whether an error occurred
+  
     for (let i = 0; i < files.length; i++) {
       const singleFile = files[i];
   
@@ -52,14 +63,32 @@ export default function Home() {
           method: "POST",
           body: singleFileFormData,
         });
-        const result = await response.json();
-        console.log(result);
+  
+        const result = await response.text(); // Get the full response as text
+  
+        if (!response.ok) {
+          errorOccurred = true;
+          break; // Break out of the loop on the first error
+        }
+
+        console.log(result); // Log the full response
       } catch (error) {
-        console.error("Error uploading file:", error);
+        alert(
+          "An error occurred during file upload. Please check the console for more details."
+        );
+        errorOccurred = true;
+        break; // Break out of the loop on the first error
       }
     }
-  };
   
+    if (!errorOccurred) {
+      alert("Folder upload completed successfully");
+    }
+    else{
+      alert("Folder upload failed, content of folder must all be an image")
+    }
+  };
+
   return (
     <>
       <Navbar />
@@ -86,7 +115,7 @@ export default function Home() {
             Insert Image
           </button>
           <div>
-            <input type="file" ref={fileInputRef}/>
+            <input type="file" ref={fileInputRef} />
             <button onClick={handleFileUpload}>Upload Query Image</button>
             <input
               type="file"
