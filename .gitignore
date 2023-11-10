@@ -35,5 +35,10 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-src/server/uploads/dataset/
+# server files
 src/server/node_modules/
+src/server/uploads/dataset/
+src/server/uploads/*.json
+src/server/uploads/*.jpg 
+src/server/uploads/*.jpeg 
+src/server/uploads/*.png
