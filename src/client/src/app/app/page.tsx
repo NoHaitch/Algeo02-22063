@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRef, useState } from "react";
 import { motion } from "framer-motion";
+import ImgItems from "@/components/ImgItems";
 
 export default function App() {
   const imgInputRef = useRef<HTMLInputElement>(null);
@@ -16,6 +17,8 @@ export default function App() {
     image: "empty",
     dataset: "empty",
   });
+
+  const [isUploading, setIsUploading] = useState(false);
 
   /* UPLOADING FILES */
   const handleImgUpload = async () => {
@@ -69,9 +72,11 @@ export default function App() {
     const datasetInput = datasetInputRef.current;
     const files = datasetInput?.files;
     const startTime = new Date();
+    setIsUploading(true);
 
     if (!files || files.length === 0) {
       createDangerAlert("Please select a folder");
+      setIsUploading(false);
       return;
     }
 
@@ -92,14 +97,14 @@ export default function App() {
           body: singleFileFormData,
         });
 
-        const result = await response.text(); // Get the full response as text
+        const result = await response.text();
 
         if (!response.ok) {
           errorOccurred = true;
           break; // Break out of the loop on the first error
         }
 
-        console.log(result); // Log the full response
+        console.log(result);
       } catch (error) {
         createDangerAlert(
           "An error occurred during file upload. Please check the console for more details."
@@ -108,14 +113,26 @@ export default function App() {
         break; // Break out of the loop on the first error
       }
     }
-
+    setIsUploading(false);
+    
     if (!errorOccurred) {
       const endTime = new Date();
       createSuccessAlert(
         `Folder upload completed successfully\nTime : ${
           (endTime.getTime() - startTime.getTime()) / 1000
         } second`
-      );
+        );
+
+      // delete the last dataset
+      try {
+        fetch("http://127.0.0.1:8080/api/refresh-dataset", {
+          method: "POST",
+        });
+      } catch (error) {
+        console.log("dataset folder not found thus nothing is deleted");
+        console.error(error);
+      }
+
       setData((prevData) => ({
         ...prevData,
         dataset: folderName || "",
@@ -159,7 +176,6 @@ export default function App() {
     }
   };
 
-  
   /* ALERTS SECTION */
   const hideAlert = (id: string) => {
     const alertElement = document.getElementById(id);
@@ -285,7 +301,7 @@ export default function App() {
                     <span className="absolute bottom-0 right-0 block w-64 h-64 mb-32 mr-4 transition duration-500 origin-bottom-left transform rotate-45 translate-x-24 bg-pink-500 rounded-full opacity-30 group-hover:rotate-90 ease"></span>
                     <span className="relative text-white">Upload</span>
                     <svg
-                      className="ml-2 w-5 h-5 z-10"
+                      className="ml-2 w-5 h-5 z-[10]"
                       fill="none"
                       stroke="white"
                       viewBox="0 0 24 24"
@@ -329,7 +345,7 @@ export default function App() {
                 height={330}
                 width={330}
                 alt="Picture of the author"
-                className="rounded-[25px] drop-shadow-[4px_4px_2.5px_#000] border-2 border-[--trinary]"
+                className="rounded-[25px] drop-shadow-[4px_4px_2.5px_#000] border-2 border-[--trinary] bg-gray-300"
               />
               <label ref={currentImgLabelRef}>file.jpg</label>
             </div>
@@ -349,7 +365,7 @@ export default function App() {
         <div className="imgItems m-5"></div>
         <div
           id="success-alert"
-          className="absolute z-10 top-0 mt-5 flex items-center p-4 mb-4 rounded-lg bg-gray-800 text-green-400 drop-shadow-2xl"
+          className="absolute z-[10] top-0 mt-5 flex items-center p-4 mb-4 rounded-lg bg-gray-800 text-green-400 drop-shadow-2xl"
           role="alert"
           style={{ display: "none" }}
         >
@@ -370,7 +386,7 @@ export default function App() {
           <button
             type="button"
             onClick={() => hideAlert("success-alert")}
-            className="ms-auto ml-3 -mx-1.5 -my-1.5 bg-green-50 text-green-500 rounded-lg focus:ring-2 focus:ring-green-400 p-1.5 hover:bg-green-200 inline-flex items-center justify-center h-8 w-8 dark:bg-gray-800 dark:text-green-400 dark:hover:bg-gray-700"
+            className="ms-auto ml-3 -mx-1.5 -my-1.5 bg-gray-800 text-green-400 rounded-lg focus:ring-2 focus:ring-green-400 p-1.5 hover:bg-green-200 inline-flex items-center justify-center h-8 w-8"
           >
             <span className="sr-only">Close</span>
             <svg
@@ -392,7 +408,7 @@ export default function App() {
         </div>
         <div
           id="danger-alert"
-          className="absolute z-10 top-0 mt-5 flex items-center p-4 mb-4 text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400"
+          className="absolute z-[10] top-0 mt-5 flex items-center p-4 mb-4 bg-gray-800 text-red-400 rounded-lg"
           role="alert"
           style={{ display: "none" }}
         >
@@ -412,7 +428,7 @@ export default function App() {
           ></div>
           <button
             type="button"
-            className="ms-auto ml-3 -mx-1.5 -my-1.5 bg-red-50 text-red-500 rounded-lg focus:ring-2 focus:ring-red-400 p-1.5 hover:bg-red-200 inline-flex items-center justify-center h-8 w-8 dark:bg-gray-800 dark:text-red-400 dark:hover:bg-gray-700"
+            className="ms-auto ml-3 -mx-1.5 -my-1.5 bg-gray-800 text-red-400 rounded-lg focus:ring-2 focus:ring-red-400 p-1.5 hover:bg-red-200 inline-flex items-center justify-center h-8 w-8 "
             onClick={() => hideAlert("danger-alert")}
           >
             <span className="sr-only">Close</span>
@@ -434,9 +450,43 @@ export default function App() {
           </button>
         </div>
       </main>
+      <section>
+      <div className="grid grid-cols-4 grid-rows-2 w-full">
+          <ImgItems start={1} end={8}/>
+        </div>
+      </section>
       <button onClick={handleImgUpload} className="hidden"></button>
       <button onClick={handleDatasetUpload} className="hidden"></button>
       <div className="absolute left-0 top-0 app-body-background h-screen w-screen z-[-20]"></div>
+
+      {isUploading && (
+        <div className="fixed top-0 left-0 flex flex-col justify-center items-center h-screen w-screen z-[10] bg-black opacity-75 ">
+          <div role="status">
+            <div className="absolute top-0 left-0 flex flex-col justify-center items-center h-screen w-screen z-[10] bg-black opacity-75">
+              <div role="status">
+                <svg
+                  aria-hidden="true"
+                  className="inline w-8 h-8 text-gray-200 animate-spin  fill-blue-600"
+                  viewBox="0 0 100 101"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                    fill="currentColor"
+                  />
+                  <path
+                    d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                    fill="currentFill"
+                  />
+                </svg>
+                <span className="sr-only">Loading...</span>
+              </div>
+              <h1 className="text-white m-4 text-xl">Loading . . .</h1>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

@@ -38,6 +38,7 @@ next-env.d.ts
 # server files
 src/server/node_modules/
 src/server/uploads/dataset/
+src/server/uploads/tempdataset/
 src/server/uploads/*.json
 src/server/uploads/*.jpg 
 src/server/uploads/*.jpeg 

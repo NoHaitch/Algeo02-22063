@@ -24,7 +24,7 @@ export default function RootLayout({
           rel="stylesheet"
         ></link>
       </head>
-      <body className="container mx-auto p-5 w-screen h-screen">
+      <body className="container mx-auto p-5 w-screen">
         {children}
       </body>
     </html>
