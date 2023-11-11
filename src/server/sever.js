@@ -11,24 +11,9 @@ const PORT = 8080;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const DATA_FILE_PATH1 = path.join(__dirname, 'uploads', 'image.json');
-const DATA_FILE_PATH2 = path.join(__dirname, 'uploads', 'dataset.json');
+const DATA_FILE_PATH2 = path.join(__dirname, 'uploads', 'tempdataset.json');
+const DATASET_PATH = path.join(__dirname, 'uploads', 'dataset');
 
-// Check if the JSON file exists, and create it if it doesn't
-async function ensureJsonFile() {
-  try {
-    await fs.access(DATA_FILE_PATH1);
-  } catch (error) {
-    // The file doesn't exist, create it with an empty array
-    await fs.writeFile(DATA_FILE_PATH1, '[]');
-  }
-  try {
-    await fs.access(DATA_FILE_PATH2);
-  } catch (error) {
-    // The file doesn't exist, create it with an empty array
-    await fs.writeFile(DATA_FILE_PATH2, '[]');
-  }
-}
-ensureJsonFile();
 
 app.get("/api/home", (req, res) => {
     res.json({ message: "Hello World!" });
@@ -43,6 +28,8 @@ app.use(cors());
 
 /* HOST STATIC IMG */
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads/dataset', express.static(path.join(__dirname, 'uploads/dataset')));
+
 
 /* FILTER IMG FILES */
 const imageFilter = (req, file, cb) => {
@@ -67,7 +54,7 @@ const imgStorage = multer.diskStorage({
 
 const dataStorage = multer.diskStorage({
   destination: async function (req, file, callback) {
-    const datasetFolder = path.join(__dirname, 'uploads', 'dataset');
+    const datasetFolder = path.join(__dirname, 'uploads', 'tempdataset');
 
     try {
       // Check if the dataset folder exists, and create it if it doesn't
@@ -96,6 +83,14 @@ const dataUpload = multer({
 
 /* API ACTIONS */
 app.post("/api/upload-img", ImgUpload.array("file"), async (req, res) => {
+
+  // Check for the directory, if not found then create it
+  try {
+    await fs.access(DATA_FILE_PATH1);
+  } catch (error) {
+    await fs.writeFile(DATA_FILE_PATH1, '[]');
+  }
+
   try {
     const uploadedImagesPath = path.join(__dirname, 'uploads', 'image.json');
     const lastUploadedFileName = req.files?.[0]?.originalname;
@@ -126,10 +121,15 @@ app.post("/api/upload-img", ImgUpload.array("file"), async (req, res) => {
   }
 });
 
-
 app.post("/api/upload-data", dataUpload.array("file"), async (req, res) => {
   try {
-    const uploadedDatasetPath = path.join(__dirname, 'uploads', 'dataset.json');
+    await fs.access(DATA_FILE_PATH2);
+  } catch (error) {
+    // The file doesn't exist, create it with an empty array
+    await fs.writeFile(DATA_FILE_PATH2, '[]');
+  }
+  try {
+    const uploadedDatasetPath = path.join(__dirname, 'uploads', 'tempdataset.json');
     const lastUploadedFileNames = req.files.map(file => file.originalname);
 
     // Read the existing dataset information from the JSON file
@@ -147,12 +147,13 @@ app.post("/api/upload-data", dataUpload.array("file"), async (req, res) => {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
   }
-});
+}); 
 
+/* Delete the third image from the newest uploaded img */
 app.delete("/api/delete-last-image", async (req, res) => {
 try {
   // Read the existing uploaded images from the JSON file
-  const uploadedImagesPath = path.join(__dirname, 'uploads', '/uploads/image.json');
+  const uploadedImagesPath = path.join(__dirname, 'uploads', '/image.json');
   const existingImagesData = await fs.readFile(uploadedImagesPath, 'utf-8');
   const existingImages = existingImagesData ? JSON.parse(existingImagesData) : [];
 
@@ -174,4 +175,75 @@ try {
   console.error(error);
   res.status(500).json({ error: "Internal Server Error" });
 }
+});
+
+/* Refresh dataset */
+app.post("/api/refresh-dataset", async (req, res) => {
+  try {
+    // Check if the dataset folder exists, and create it if it doesn't
+    await fs.access(DATASET_PATH);
+  } catch (error) {
+    await fs.mkdir(DATASET_PATH);
+  }
+
+  try {
+    // Check if the dataset folder exists, and create it if it doesn't
+    await fs.access(DATASET_PATH);
+    await fs.rm(DATASET_PATH, { recursive: true }, (error) => {
+      if (error) {
+        console.error(error);
+        res.status(500).json({ error: "Internal Server Error" });
+      } else {
+        res.json({ message: "Folder deleted successfully" });
+      }
+    });
+  } catch (error) {
+    await fs.mkdir(DATASET_PATH);
+  }
+
+  try {
+    // Rename the "tempdataset" folder to "dataset"
+    await fs.rename(
+      path.join(__dirname, 'uploads', 'tempdataset'),
+      path.join(__dirname, 'uploads', 'dataset')
+    );
+    // Rename the json
+    await fs.rename(
+      path.join(__dirname, 'uploads', 'tempdataset.json'),
+      path.join(__dirname, 'uploads', 'dataset.json')
+    );
+    res.json({ message: "Folder renamed successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+
+});
+
+app.delete("/api/reset-temp", async (req, res) => {
+  const tempdatasetPath = path.join(__dirname, 'uploads', 'tempdataset');
+  try {
+    await fs.access(tempdatasetPath);
+    await fs.rm(tempdatasetPath, { recursive: true }, (error) => {
+      if (error) {
+        console.error(error);
+        res.status(500).json({ error: "Internal Server Error" });
+      } else {
+        res.json({ message: "Folder deleted successfully" });
+      }
+    });
+  } catch (error) {
+  }
+
+  try {
+    await fs.access(path.join(__dirname, 'uploads', 'tempdataset.json'));
+    await fs.unlink(path.join(__dirname, 'uploads', 'tempdataset.json'), (error) => {
+      if (error) {
+        res.status(500).json({ error: "Internal Server Error" });
+      } else {
+        res.json({ message: "Folder deleted successfully" });
+      }
+    });
+  } catch (error) {
+  }
 });

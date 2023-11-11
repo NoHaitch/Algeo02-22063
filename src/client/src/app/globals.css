@@ -45,3 +45,7 @@ button{
 a {
   user-select: none;
 }
+
+.about-us-page{
+  background: radial-gradient(220.45% 279.86% at 50% 98.86%, #bfc5fa 0%, white 100%) /* warning: gradient uses a rotation that is not supported by CSS and may not behave as expected */;
+}

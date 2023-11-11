@@ -6,7 +6,7 @@ export default function AboutUs() {
   return (
     <>
       <Navbar />
-      <main className="flex flex-col w-full items-center space-y-6p-5 my-5 rounded-3xl pb-12">
+      <main className="about-us-page w-[85%] flex flex-col items-center space-y-6p-5 m-5 rounded-3xl pb-12 mx-auto mt-[50px] p-5 shadow-2xl">
         <div className="title flex flex-col items-center justify-center m-5">
           <Image
             src="/phoenix.png"
@@ -16,11 +16,11 @@ export default function AboutUs() {
             className="about-us-logo"
           />
           <div className="font-bold text-center">
-            <h1 className="text-3xl">PhoenixImage.</h1>
+            <h1 className="text-2xl">PhoenixImage.</h1>
             <h2 className="text-base">Bjir Anak Nopal. Kelompok 23.</h2>
           </div>
         </div>
-        <div className="text-lg space-y-5 w-[80%]">
+        <div className="text-base space-y-5 w-[70%]">
           <p>
             <strong>PhoenixImage</strong> merupakan Content-Based Image Retrieval System atau CBIR System yang
             dibuat sebagai tugas besar 2 mata kuliah IF2123 Aljabar Linier dan
@@ -42,9 +42,10 @@ export default function AboutUs() {
             <li>13522071@std.stei.itb.ac.id</li>
             <li>13522091@std.stei.itb.ac.id</li>
           </ul>
-          <p><strong>NOTE : </strong> We don't own all the image nor the logo used in this project</p>
-          <h1> Thats All! Enjoy our Result!</h1>
         </div>
+          <p className="m-4"><strong>NOTE : </strong> We don't own all the image nor the logo used in this project</p>
+          <h1 className="text-xl font-bold m-5"> Thats All! Enjoy our Result!</h1>
+          <h1 className="mt-[24px] mb-[100px]">FYI : the source code is honestly a bit messy</h1>
       </main>
     </>
   );

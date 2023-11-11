@@ -6,7 +6,7 @@ export default function page() {
   return (
     <>
       <Navbar />
-      <main className="grid grid-cols-2 gap-4 h-full w-full -mt-14 items-center justify-between">
+      <main className="grid grid-cols-2 gap-4 h-screen w-full -mt-14 items-center justify-between">
         <div className="flex flex-col text-[--primary] font-bold">
           <h1 className="text-5xl  max-w-[600px]">
             Content-Based Image Retrieval System
@@ -44,9 +44,9 @@ export default function page() {
                 xmlns="http://www.w3.org/2000/svg"
               >
                 <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
                   d="M14 5l7 7m0 0l-7 7m7-7H3"
                 ></path>
               </svg>
