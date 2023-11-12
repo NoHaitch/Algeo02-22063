@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRef, useState } from "react";
 import { motion } from "framer-motion";
 import ImgItems from "@/components/ImgItems";
+import GetAllImgItems from "@/components/getAllImgItems";
 
 export default function App() {
   const imgInputRef = useRef<HTMLInputElement>(null);
@@ -114,14 +115,14 @@ export default function App() {
       }
     }
     setIsUploading(false);
-    
+
     if (!errorOccurred) {
       const endTime = new Date();
       createSuccessAlert(
         `Folder upload completed successfully\nTime : ${
           (endTime.getTime() - startTime.getTime()) / 1000
         } second`
-        );
+      );
 
       // delete the last dataset
       try {
@@ -451,9 +452,7 @@ export default function App() {
         </div>
       </main>
       <section>
-      <div className="grid grid-cols-4 grid-rows-2 w-full">
-          <ImgItems start={1} end={8}/>
-        </div>
+        <GetAllImgItems />
       </section>
       <button onClick={handleImgUpload} className="hidden"></button>
       <button onClick={handleDatasetUpload} className="hidden"></button>
