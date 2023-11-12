@@ -12,9 +12,9 @@
     <a href="#">www.Example.com</a>
     <br>
     <br>
-    <a href="https://github.com/mrsuiii/Tubes-Alstrukdat/issues">Report Bug</a>
+    <a href="https://github.com/NoHaitch/Tubes2_Algeo/issues">Report Bug</a>
     ·
-    <a href="https://github.com/mrsuiii/Tubes-Alstrukdat/issues">Request Feature</a>
+    <a href="https://github.com/NoHaitch/Tubes2_Algeo/issues">Request Feature</a>
 <br>
 <br>
 
@@ -198,6 +198,6 @@ Code dalam projek ini berada di bawah lisensi MIT.
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[issues-url]: https://github.com/othneildrew/Best-README-Template/issues
+[issues-url]: https://github.com/NoHaitch/Tubes2_Algeo/issues
 [license-shield]: https://img.shields.io/github/license/othneildrew/Best-README-Template.svg?style=for-the-badge
-[license-url]: https://github.com/othneildrew/Best-README-Template/blob/master/LICENSE.txt
+[license-url]: https://github.com/NoHaitch/Tubes2_Algeo/blob/main/LICENSE

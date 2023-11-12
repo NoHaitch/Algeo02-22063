@@ -1,12 +1,18 @@
+"use client";
 import Navbar from "@/components/Navbar";
 import Image from "next/image";
 import Link from "next/link";
+import { motion } from "framer-motion";
 
 export default function page() {
   return (
     <>
       <Navbar />
-      <main className="grid grid-cols-2 gap-4 h-screen w-full -mt-14 items-center justify-between">
+      <motion.main 
+      initial={{ opacity: 0, y: -100 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.2 }}
+      className="flex flex-row h-[90vh] w-[full] -mt-14 items-center justify-evenly">
         <div className="flex flex-col text-[--primary] font-bold">
           <h1 className="text-5xl  max-w-[600px]">
             Content-Based Image Retrieval System
@@ -69,9 +75,9 @@ export default function page() {
                 xmlns="http://www.w3.org/2000/svg"
               >
                 <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
                   d="M14 5l7 7m0 0l-7 7m7-7H3"
                 ></path>
               </svg>
@@ -85,9 +91,9 @@ export default function page() {
                 xmlns="http://www.w3.org/2000/svg"
               >
                 <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
                   d="M14 5l7 7m0 0l-7 7m7-7H3"
                 ></path>
               </svg>
@@ -106,7 +112,8 @@ export default function page() {
             className="rounded-[25px] drop-shadow-[10px_10px_5px_#000]"
           />
         </div>
-        <div className="absolute z-[-10] right-0 bottom-0">
+      </motion.main>
+      <div className="absolute z-[-10] right-0 bottom-0">
           <svg
             width="1345"
             height="1024"
@@ -123,7 +130,6 @@ export default function page() {
             />
           </svg>
         </div>
-      </main>
     </>
   );
 }
