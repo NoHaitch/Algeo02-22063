@@ -10,7 +10,7 @@ export default function GetAllImgItems() {
   const imgCount = imgData.length;
   const pageCount = Math.ceil(imgCount / itemsPerPage);
 
-  const [currentPage, setCurrentPage] = useState(3);
+  const [currentPage, setCurrentPage] = useState(1);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = currentPage * itemsPerPage;
 
