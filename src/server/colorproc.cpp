@@ -1,22 +1,23 @@
 #include <iostream>
 #include <string>
 #define STB_IMAGE_IMPLEMENTATION
-#include "stb/stb_image.h"
+#include "lib/stb/stb_image.h"
 #define STB_IMAGE_WRITE_IMPLEMENTATION
-#include "stb/stb_image_write.h"
+#include "lib/stb/stb_image_write.h"
 #include <chrono>
 #include <vector>
 #include "test.cpp"
 #define STB_IMAGE_RESIZE_IMPLEMENTATION
-#include "stb/stb_image_resize2.h"
-#include "json/json.hpp"
+#include "lib/stb/stb_image_resize2.h"
+#include "lib/json/json.hpp"
 #include <fstream>
 #include <filesystem>
 
 typedef struct {
-    vector <string> path;
-    vector <float> cosine;
-} Result;
+    string path;
+    float cosine;
+} ElType;
+
 
 typedef struct {
     float h;
@@ -182,63 +183,63 @@ int checkCos(float cos) {
 }
 
 
-void queryAllImage(const string& pathImage, const string& path, Result *hasil) {
+void queryAllImage(const string& pathImage, const string& path, vector <ElType> *hasil) {
     auto *mat1 = new vector <vector <HSV>>;
     *mat1 = convertImagetoHSV(pathImage);
+    int step = 0;
     for (const auto& entry : fs::directory_iterator(path)) {
         auto *matQuery = new vector<vector<HSV>>;
-//        stbi_info((path + entry.path().filename().string()).c_str(), NULL, NULL, NULL);
         *matQuery = convertImagetoHSV(path + entry.path().filename().string());
         float cos = cosBlock(*mat1, *matQuery, 10, 10);
         if (checkCos(cos)) {
-            ((*hasil).path).push_back(entry.path().filename().string());
-            ((*hasil).cosine).push_back(cos);
+            ElType temp;
+            temp.path = entry.path().filename().string();
+            temp.cosine = cos;
+            (*hasil).push_back(temp);
+        }
+        step++;
+        if (step == 500) {
+            break;
         }
         free(matQuery);
     }
     free(mat1);
 }
 
-
-int binarySearch(vector <float> a, float item,
-                 int low, int high)
-{
+int binarySearch(const std::vector<ElType>& a, float item,
+                 int low, int high) {
     if (high <= low)
-        return (item < a[low]) ?
+        return (item < a[low].cosine) ?
                (low + 1) : low;
 
     int mid = (low + high) / 2;
 
-    if (item == a[mid])
+    if (item == a[mid].cosine)
         return mid + 1;
 
-    if (item < a[mid])
-        return binarySearch(a, item,
-                            mid + 1, high);
-    return binarySearch(a, item, low,
-                        mid - 1);
+    if (item < a[mid].cosine)
+        return binarySearch(a, item, mid + 1, high);
+    return binarySearch(a, item, low, mid - 1);
 }
 
-
-void sortResult(Result *a) {
+// Function to sort a vector of ElType
+void sortResult(std::vector<ElType>& a) {
     int i, j, loc;
     float selected;
-    for (i = 1; i < (*a).path.size(); ++i)
-    {
+    for (i = 1; i < a.size(); ++i) {
         j = i - 1;
-        selected = (*a).cosine[i];
-        string selectedPath = (*a).path[i];
+        selected = a[i].cosine;
+        std::string selectedPath = a[i].path;
 
-        loc = binarySearch((*a).cosine, selected, 0, j);
+        loc = binarySearch(a, selected, 0, j);
 
-        while (j >= loc)
-        {
-            (*a).cosine[j + 1] = (*a).cosine[j];
-            (*a).path[j + 1] = (*a).path[j];
+        while (j >= loc) {
+            a[j + 1].cosine = a[j].cosine;
+            a[j + 1].path = a[j].path;
             j--;
         }
-        (*a).cosine[j + 1] = selected;
-        (*a).path[j + 1] = selectedPath;
+        a[j + 1].cosine = selected;
+        a[j + 1].path = selectedPath;
     }
 }
 
@@ -247,20 +248,20 @@ int main() {
     string path, path2;
     cout << "Masukkan image yang akan dicek:";
     cin >> path;
-    path = "D:/Python/tubes2_algeo/src/client/src/app/api/archive/dataset/" + path;
+    path = "uploads/" + path;
     auto start = chrono::high_resolution_clock::now();
-    path2 = "D:/Python/tubes2_algeo/src/client/src/app/api/archive/dataset/";
-    auto *hasil = new Result;
+    path2 = "uploads/dataset/";
+    auto *hasil = new vector <ElType>;
     queryAllImage(path, path2, hasil);
-    sortResult(hasil);
+    sortResult(*hasil);
 //    for (int i = 0; i < (*hasil).path.size(); i++) {
 //        cout << (*hasil).path[i] << ": " << (*hasil).cosine[i] << endl;
 //    }
     json jsonOutput;
-    for (int i = 0; i < (*hasil).path.size(); i++) {
+    for (const auto& el : *hasil) {
         jsonOutput.push_back({
-                                     {"path", (*hasil).path[i]},
-                                     {"cosine", (*hasil).cosine[i]}
+                                     {"path", el.path},
+                                     {"cosine", el.cosine}
                              });
     }
     string filename = "output.json";
