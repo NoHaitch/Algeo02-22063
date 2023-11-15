@@ -3904,7 +3904,7 @@ static void stbir__calculate_filters( stbir__sampler * samp, stbir__sampler * ot
 
 #define stbir__coder_min_num 1
 #define STB_IMAGE_RESIZE_DO_CODERS
-#include STBIR__HEADER_FILENAME
+#include STBIR__HEADER_FILENAME//"stb_image_resize2.h"
 
 #define stbir__decode_suffix BGRA
 #define stbir__decode_swizzle
@@ -3918,7 +3918,7 @@ static void stbir__calculate_filters( stbir__sampler * samp, stbir__sampler * ot
 #define stbir__encode_order3  3
 #define stbir__coder_min_num 4
 #define STB_IMAGE_RESIZE_DO_CODERS
-#include STBIR__HEADER_FILENAME
+#include STBIR__HEADER_FILENAME//"stb_image_resize2.h"
 
 #define stbir__decode_suffix ARGB
 #define stbir__decode_swizzle
@@ -3932,7 +3932,7 @@ static void stbir__calculate_filters( stbir__sampler * samp, stbir__sampler * ot
 #define stbir__encode_order3  2
 #define stbir__coder_min_num 4
 #define STB_IMAGE_RESIZE_DO_CODERS
-#include STBIR__HEADER_FILENAME
+#include STBIR__HEADER_FILENAME//"stb_image_resize2.h"
 
 #define stbir__decode_suffix ABGR
 #define stbir__decode_swizzle
@@ -3946,7 +3946,7 @@ static void stbir__calculate_filters( stbir__sampler * samp, stbir__sampler * ot
 #define stbir__encode_order3  0
 #define stbir__coder_min_num 4
 #define STB_IMAGE_RESIZE_DO_CODERS
-#include STBIR__HEADER_FILENAME
+#include STBIR__HEADER_FILENAME//"stb_image_resize2.h"
 
 #define stbir__decode_suffix AR
 #define stbir__decode_swizzle
@@ -3960,7 +3960,7 @@ static void stbir__calculate_filters( stbir__sampler * samp, stbir__sampler * ot
 #define stbir__encode_order3  2
 #define stbir__coder_min_num 2
 #define STB_IMAGE_RESIZE_DO_CODERS
-#include STBIR__HEADER_FILENAME
+#include STBIR__HEADER_FILENAME//"stb_image_resize2.h"
 
 
 // fancy alpha means we expand to keep both premultipied and non-premultiplied color channels
@@ -4574,7 +4574,7 @@ static void stbir__decode_scanline(stbir__info const * stbir_info, int n, float 
 
 #define STBIR__horizontal_channels 1
 #define STB_IMAGE_RESIZE_DO_HORIZONTALS
-#include STBIR__HEADER_FILENAME
+#include STBIR__HEADER_FILENAME//"stb_image_resize2.h"
 
 
 //=================
@@ -4813,7 +4813,7 @@ static void stbir__decode_scanline(stbir__info const * stbir_info, int n, float 
 
 #define STBIR__horizontal_channels 2
 #define STB_IMAGE_RESIZE_DO_HORIZONTALS
-#include STBIR__HEADER_FILENAME
+#include STBIR__HEADER_FILENAME//"stb_image_resize2.h"
 
 
 //=================
@@ -5114,7 +5114,7 @@ static void stbir__decode_scanline(stbir__info const * stbir_info, int n, float 
 
 #define STBIR__horizontal_channels 3
 #define STB_IMAGE_RESIZE_DO_HORIZONTALS
-#include STBIR__HEADER_FILENAME
+#include STBIR__HEADER_FILENAME//"stb_image_resize2.h"
 
 //=================
 // Do 4 channel horizontal routines
@@ -5411,7 +5411,7 @@ static void stbir__decode_scanline(stbir__info const * stbir_info, int n, float 
 
 #define STBIR__horizontal_channels 4
 #define STB_IMAGE_RESIZE_DO_HORIZONTALS
-#include STBIR__HEADER_FILENAME
+#include STBIR__HEADER_FILENAME//"stb_image_resize2.h"
 
 
 
@@ -5814,82 +5814,82 @@ static void stbir__decode_scanline(stbir__info const * stbir_info, int n, float 
 
 #define STBIR__horizontal_channels 7
 #define STB_IMAGE_RESIZE_DO_HORIZONTALS
-#include STBIR__HEADER_FILENAME
+#include STBIR__HEADER_FILENAME//"stb_image_resize2.h"
 
 
 // include all of the vertical resamplers (both scatter and gather versions)
 
 #define STBIR__vertical_channels 1
 #define STB_IMAGE_RESIZE_DO_VERTICALS
-#include STBIR__HEADER_FILENAME
+#include STBIR__HEADER_FILENAME//"stb_image_resize2.h"
 
 #define STBIR__vertical_channels 1
 #define STB_IMAGE_RESIZE_DO_VERTICALS
 #define STB_IMAGE_RESIZE_VERTICAL_CONTINUE
-#include STBIR__HEADER_FILENAME
+#include STBIR__HEADER_FILENAME//"stb_image_resize2.h"
 
 #define STBIR__vertical_channels 2
 #define STB_IMAGE_RESIZE_DO_VERTICALS
-#include STBIR__HEADER_FILENAME
+#include STBIR__HEADER_FILENAME//"stb_image_resize2.h"
 
 #define STBIR__vertical_channels 2
 #define STB_IMAGE_RESIZE_DO_VERTICALS
 #define STB_IMAGE_RESIZE_VERTICAL_CONTINUE
-#include STBIR__HEADER_FILENAME
+#include STBIR__HEADER_FILENAME//"stb_image_resize2.h"
 
 #define STBIR__vertical_channels 3
 #define STB_IMAGE_RESIZE_DO_VERTICALS
-#include STBIR__HEADER_FILENAME
+#include STBIR__HEADER_FILENAME//"stb_image_resize2.h"
 
 #define STBIR__vertical_channels 3
 #define STB_IMAGE_RESIZE_DO_VERTICALS
 #define STB_IMAGE_RESIZE_VERTICAL_CONTINUE
-#include STBIR__HEADER_FILENAME
+#include STBIR__HEADER_FILENAME//"stb_image_resize2.h"
 
 #define STBIR__vertical_channels 4
 #define STB_IMAGE_RESIZE_DO_VERTICALS
-#include STBIR__HEADER_FILENAME
+#include STBIR__HEADER_FILENAME//"stb_image_resize2.h"
 
 #define STBIR__vertical_channels 4
 #define STB_IMAGE_RESIZE_DO_VERTICALS
 #define STB_IMAGE_RESIZE_VERTICAL_CONTINUE
-#include STBIR__HEADER_FILENAME
+#include STBIR__HEADER_FILENAME//"stb_image_resize2.h"
 
 #define STBIR__vertical_channels 5
 #define STB_IMAGE_RESIZE_DO_VERTICALS
-#include STBIR__HEADER_FILENAME
+#include STBIR__HEADER_FILENAME//"stb_image_resize2.h"
 
 #define STBIR__vertical_channels 5
 #define STB_IMAGE_RESIZE_DO_VERTICALS
 #define STB_IMAGE_RESIZE_VERTICAL_CONTINUE
-#include STBIR__HEADER_FILENAME
+#include STBIR__HEADER_FILENAME//"stb_image_resize2.h"
 
 #define STBIR__vertical_channels 6
 #define STB_IMAGE_RESIZE_DO_VERTICALS
-#include STBIR__HEADER_FILENAME
+#include STBIR__HEADER_FILENAME//"stb_image_resize2.h"
 
 #define STBIR__vertical_channels 6
 #define STB_IMAGE_RESIZE_DO_VERTICALS
 #define STB_IMAGE_RESIZE_VERTICAL_CONTINUE
-#include STBIR__HEADER_FILENAME
+#include STBIR__HEADER_FILENAME//"stb_image_resize2.h"
 
 #define STBIR__vertical_channels 7
 #define STB_IMAGE_RESIZE_DO_VERTICALS
-#include STBIR__HEADER_FILENAME
+#include STBIR__HEADER_FILENAME//"stb_image_resize2.h"
 
 #define STBIR__vertical_channels 7
 #define STB_IMAGE_RESIZE_DO_VERTICALS
 #define STB_IMAGE_RESIZE_VERTICAL_CONTINUE
-#include STBIR__HEADER_FILENAME
+#include STBIR__HEADER_FILENAME//"stb_image_resize2.h"
 
 #define STBIR__vertical_channels 8
 #define STB_IMAGE_RESIZE_DO_VERTICALS
-#include STBIR__HEADER_FILENAME
+#include STBIR__HEADER_FILENAME//"stb_image_resize2.h"
 
 #define STBIR__vertical_channels 8
 #define STB_IMAGE_RESIZE_DO_VERTICALS
 #define STB_IMAGE_RESIZE_VERTICAL_CONTINUE
-#include STBIR__HEADER_FILENAME
+#include STBIR__HEADER_FILENAME//"stb_image_resize2.h"
 
 typedef void STBIR_VERTICAL_GATHERFUNC( float * output, float const * coeffs, float const ** inputs, float const * input0_end );
 
