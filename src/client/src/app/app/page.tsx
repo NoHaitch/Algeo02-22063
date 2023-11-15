@@ -13,6 +13,8 @@ export default function App() {
   const currentImgShownRef = useRef<HTMLImageElement>(null);
   const currentImgLabelRef = useRef<HTMLLabelElement>(null);
 
+  const [toggle, setToggle] = useState<boolean>(false);
+
   const [currentData, setData] = useState({
     selectedDataset: "",
     image: "empty",
@@ -330,21 +332,32 @@ export default function App() {
               </div>
               <div className="-mr-5 text-l font-bold flex flex-row space-x-3 mt-5">
                 <h3>Color</h3>
-                <Switch />
+                <div
+                  onClick={() => setToggle(!toggle)}
+                  className={`flex h-7 w-14 cursor-pointer rounded-full border-2  border-[--primary] ${
+                    toggle
+                      ? "justify-start bg-white"
+                      : "justify-end bg-[--primary]"
+                  } p-[2px] `}
+                >
+                  <motion.div
+                    className={`h-5 w-5 rounded-full ${
+                      toggle ? "bg-[--primary]" : "bg-white"
+                    }`}
+                    layout
+                    transition={{ type: "spring", stiffness: 700, damping: 30 }}
+                  />
+                </div>
                 <h3>Texture</h3>
               </div>
-              <div className="font-bold text-[--trinary] p-5">
-                <h1>Current Server Data</h1>
-                <h2>Image : {currentData.image}</h2>
-                <h2>Dataset : {currentData.dataset}</h2>
-              </div>
+
             </div>
             <div className="text-center text-slate-600 m-5">
               <img
                 ref={currentImgShownRef}
                 src="/placeholder.jpg"
-                height={330}
-                width={330}
+                height={400}
+                width={400}
                 alt="Picture of the author"
                 className="rounded-[25px] drop-shadow-[4px_4px_2.5px_#000] border-2 border-[--trinary] bg-gray-300"
               />
@@ -361,6 +374,9 @@ export default function App() {
               <span className="relative text-white">Search</span>
             </Link>
           </div>
+          <div className="font-bold text-[--trinary] p-5 text-center">
+                <h2>Dataset : {currentData.dataset}</h2>
+              </div>
         </motion.div>
         <span className="m-4 h-0.5 w-full bg-[--secondary]"></span>
         <div className="imgItems m-5"></div>
@@ -451,12 +467,10 @@ export default function App() {
           </button>
         </div>
       </main>
-      <section>
-        <GetAllImgItems />
-      </section>
+      <GetAllImgItems />
       <button onClick={handleImgUpload} className="hidden"></button>
       <button onClick={handleDatasetUpload} className="hidden"></button>
-      <div className="absolute left-0 top-0 app-body-background h-screen w-screen z-[-20]"></div>
+      <div className="absolute left-0 top-0 app-body-background h-screen w-full z-[-20]"></div>
 
       {isUploading && (
         <div className="fixed top-0 left-0 flex flex-col justify-center items-center h-screen w-screen z-[10] bg-black opacity-75 ">

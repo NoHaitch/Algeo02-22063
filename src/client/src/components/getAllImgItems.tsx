@@ -20,8 +20,8 @@ export default function GetAllImgItems() {
   };
 
   return (
-    <>
-      <div className="flex flex-row space-x-4 justify-center">
+    <section>
+      {imgCount > 0 && (<div className="flex flex-row space-x-4 justify-center">
         <nav aria-label="Page navigation example">
           <ul className="flex items-center -space-x-px h-8 text-sm">
             <li>
@@ -133,8 +133,8 @@ export default function GetAllImgItems() {
             </li>
           </ul>
         </nav>
-      </div>
-      <ImgItems start={startIndex} end={endIndex} />
-    </>
+      </div>)}
+      {imgCount > 0 && (<ImgItems start={startIndex} end={endIndex} />)}
+    </section>
   );
 }
