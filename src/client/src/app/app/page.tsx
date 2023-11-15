@@ -1,10 +1,8 @@
 "use client";
-import Switch from "@/components/Switch";
 import Image from "next/image";
 import Link from "next/link";
 import { useRef, useState } from "react";
 import { motion } from "framer-motion";
-import ImgItems from "@/components/ImgItems";
 import GetAllImgItems from "@/components/getAllImgItems";
 
 export default function App() {
@@ -12,6 +10,8 @@ export default function App() {
   const datasetInputRef = useRef<HTMLInputElement>(null);
   const currentImgShownRef = useRef<HTMLImageElement>(null);
   const currentImgLabelRef = useRef<HTMLLabelElement>(null);
+
+  const [toggle, setToggle] = useState<boolean>(false);
 
   const [currentData, setData] = useState({
     selectedDataset: "",
@@ -144,6 +144,15 @@ export default function App() {
       );
     }
   };
+
+  const handleSearchImage =async () => {
+    if(toggle){
+      // Color search
+    } else{
+      // Texture search
+    }
+    
+  }
 
   /* SELECTING FILES */
   const openImgSelect = async () => {
@@ -329,22 +338,33 @@ export default function App() {
                 </div>
               </div>
               <div className="-mr-5 text-l font-bold flex flex-row space-x-3 mt-5">
-                <h3>Color</h3>
-                <Switch />
-                <h3>Texture</h3>
-              </div>
-              <div className="font-bold text-[--trinary] p-5">
-                <h1>Current Server Data</h1>
-                <h2>Image : {currentData.image}</h2>
-                <h2>Dataset : {currentData.dataset}</h2>
+                <h3 className={`${toggle ? "text-[--primary]" : ""}`}>Color</h3>
+
+                <div
+                  onClick={() => setToggle(!toggle)}
+                  className={`flex h-7 w-14 cursor-pointer rounded-full border-2  border-[--primary] ${
+                    toggle
+                      ? "justify-start bg-white"
+                      : "justify-end bg-[--primary]"
+                  } p-[2px] `}
+                >
+                  <motion.div
+                    className={`h-5 w-5 rounded-full ${
+                      toggle ? "bg-[--primary]" : "bg-white"
+                    }`}
+                    layout
+                    transition={{ type: "spring", stiffness: 700, damping: 30 }}
+                  />
+                </div>
+                <h3 className={`${!toggle ? "text-[--primary]" : ""}`}>Texture</h3>
               </div>
             </div>
             <div className="text-center text-slate-600 m-5">
               <img
                 ref={currentImgShownRef}
                 src="/placeholder.jpg"
-                height={330}
-                width={330}
+                height={400}
+                width={400}
                 alt="Picture of the author"
                 className="rounded-[25px] drop-shadow-[4px_4px_2.5px_#000] border-2 border-[--trinary] bg-gray-300"
               />
@@ -352,14 +372,17 @@ export default function App() {
             </div>
           </div>
           <div className="button">
-            <Link
-              href="#"
+            <button
+              onClick={() => {handleSearchImage}}
               className="relative inline-flex items-center justify-center p-4 px-5 py-3 overflow-hidden font-medium text-indigo-600 transition duration-300 ease-out rounded-full shadow-xl group hover:ring-1 hover:ring-purple-500"
             >
               <span className="absolute inset-0 w-full h-full bg-gradient-to-br from-blue-600 via-purple-600 to-pink-700"></span>
               <span className="absolute bottom-0 right-0 block w-64 h-64 mb-32 mr-4 transition duration-500 origin-bottom-left transform rotate-45 translate-x-24 bg-pink-500 rounded-full opacity-30 group-hover:rotate-90 ease"></span>
               <span className="relative text-white">Search</span>
-            </Link>
+            </button>
+          </div>
+          <div className="font-bold text-[--trinary] p-5 text-center">
+            <h2>Dataset : {currentData.dataset}</h2>
           </div>
         </motion.div>
         <span className="m-4 h-0.5 w-full bg-[--secondary]"></span>
@@ -451,12 +474,10 @@ export default function App() {
           </button>
         </div>
       </main>
-      <section>
-        <GetAllImgItems />
-      </section>
+      <GetAllImgItems />
       <button onClick={handleImgUpload} className="hidden"></button>
       <button onClick={handleDatasetUpload} className="hidden"></button>
-      <div className="absolute left-0 top-0 app-body-background h-screen w-screen z-[-20]"></div>
+      <div className="absolute left-0 top-0 app-body-background h-screen w-full z-[-20]"></div>
 
       {isUploading && (
         <div className="fixed top-0 left-0 flex flex-col justify-center items-center h-screen w-screen z-[10] bg-black opacity-75 ">
