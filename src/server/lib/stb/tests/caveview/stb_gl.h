@@ -47,8 +47,8 @@
 
 #include <stddef.h>
 
-#include <gl/gl.h>
-#include <gl/glu.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
 
 #ifndef M_PI
 #define M_PI  3.14159265358979323846f
