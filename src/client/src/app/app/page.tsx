@@ -12,11 +12,13 @@ export default function App() {
   const currentImgLabelRef = useRef<HTMLLabelElement>(null);
 
   const [toggle, setToggle] = useState<boolean>(false);
+  const [havequery, setHavequery] = useState<boolean>(false);
+  const [isSearching, setIsSeaching] = useState<boolean>(false);
 
   const [currentData, setData] = useState({
     selectedDataset: "",
-    image: "empty",
-    dataset: "empty",
+    image: "",
+    dataset: "",
   });
 
   const [isUploading, setIsUploading] = useState(false);
@@ -145,14 +147,24 @@ export default function App() {
     }
   };
 
-  const handleSearchImage =async () => {
-    if(toggle){
-      // Color search
-    } else{
-      // Texture search
+  const handleSearchImage = async () => {
+    if (currentData.dataset == "") {
+      createDangerAlert("Dataset is empty. Please upload a dataset");
+    } else if (currentData.image == "") {
+      createDangerAlert("No image to query. Please insert an image.");
+    } else {
+      setIsSeaching(true);
+      setHavequery(true);
+      if (toggle) {
+        // Color search
+        console.log("color search");
+      } else {
+        // Texture search
+        console.log("texture search");
+      }
+      setIsSeaching(false);
     }
-    
-  }
+  };
 
   /* SELECTING FILES */
   const openImgSelect = async () => {
@@ -247,7 +259,7 @@ export default function App() {
           </Link>
         </motion.div>
       </header>
-      <main className=" flex flex-col justify-center items-center select-none">
+      <main className={`flex flex-col justify-center items-center select-none ${isUploading ? ("overflow-hidden") : ""}`}>
         <motion.div
           initial={{ opacity: 0, y: -200 }}
           animate={{ opacity: 1, y: 0 }}
@@ -356,7 +368,9 @@ export default function App() {
                     transition={{ type: "spring", stiffness: 700, damping: 30 }}
                   />
                 </div>
-                <h3 className={`${!toggle ? "text-[--primary]" : ""}`}>Texture</h3>
+                <h3 className={`${!toggle ? "text-[--primary]" : ""}`}>
+                  Texture
+                </h3>
               </div>
             </div>
             <div className="text-center text-slate-600 m-5">
@@ -373,7 +387,7 @@ export default function App() {
           </div>
           <div className="button">
             <button
-              onClick={() => {handleSearchImage}}
+              onClick={handleSearchImage}
               className="relative inline-flex items-center justify-center p-4 px-5 py-3 overflow-hidden font-medium text-indigo-600 transition duration-300 ease-out rounded-full shadow-xl group hover:ring-1 hover:ring-purple-500"
             >
               <span className="absolute inset-0 w-full h-full bg-gradient-to-br from-blue-600 via-purple-600 to-pink-700"></span>
@@ -381,12 +395,13 @@ export default function App() {
               <span className="relative text-white">Search</span>
             </button>
           </div>
-          <div className="font-bold text-[--trinary] p-5 text-center">
-            <h2>Dataset : {currentData.dataset}</h2>
-          </div>
+          {currentData.dataset != "" && (
+            <div className="font-bold text-[--trinary] p-5 text-center">
+              <h2>Dataset : {currentData.dataset}</h2>
+            </div>
+          )}
         </motion.div>
         <span className="m-4 h-0.5 w-full bg-[--secondary]"></span>
-        <div className="imgItems m-5"></div>
         <div
           id="success-alert"
           className="absolute z-[10] top-0 mt-5 flex items-center p-4 mb-4 rounded-lg bg-gray-800 text-green-400 drop-shadow-2xl"
@@ -474,15 +489,8 @@ export default function App() {
           </button>
         </div>
       </main>
-      <GetAllImgItems />
-      <button onClick={handleImgUpload} className="hidden"></button>
-      <button onClick={handleDatasetUpload} className="hidden"></button>
-      <div className="absolute left-0 top-0 app-body-background h-screen w-full z-[-20]"></div>
-
-      {isUploading && (
-        <div className="fixed top-0 left-0 flex flex-col justify-center items-center h-screen w-screen z-[10] bg-black opacity-75 ">
-          <div role="status">
-            <div className="absolute top-0 left-0 flex flex-col justify-center items-center h-screen w-screen z-[10] bg-black opacity-75">
+      {!isUploading && (!isSearching ? (<GetAllImgItems query={havequery} />) : <div role="status">
+            <div className="top-0 left-0 flex flex-col justify-center items-center z-[10] ">
               <div role="status">
                 <svg
                   aria-hidden="true"
@@ -500,7 +508,35 @@ export default function App() {
                     fill="currentFill"
                   />
                 </svg>
-                <span className="sr-only">Loading...</span>
+              </div>
+              <h1 className=" m-4 text-xl">Loading . . .</h1>
+            </div>
+          </div>)}
+      <button onClick={handleImgUpload} className="hidden"></button>
+      <button onClick={handleDatasetUpload} className="hidden"></button>
+      <div className="absolute left-0 top-0 app-body-background h-screen w-full z-[-20]"></div>
+
+      {isUploading && (
+        <div className="fixed top-0 left-0 flex flex-col justify-center items-center h-screen w-screen z-[10] bg-black opacity-90 ">
+          <div role="status">
+            <div className="absolute top-0 left-0 flex flex-col justify-center items-center h-screen w-screen z-[10] bg-black opacity-90">
+              <div role="status">
+                <svg
+                  aria-hidden="true"
+                  className="inline w-8 h-8 text-gray-200 animate-spin  fill-blue-600"
+                  viewBox="0 0 100 101"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                    fill="currentColor"
+                  />
+                  <path
+                    d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                    fill="currentFill"
+                  />
+                </svg>
               </div>
               <h1 className="text-white m-4 text-xl">Loading . . .</h1>
             </div>
