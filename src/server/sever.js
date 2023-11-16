@@ -7,12 +7,19 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 
 const app = express();
+const ffi = require('ffi-napi');
 const PORT = 8080;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const DATA_FILE_PATH1 = path.join(__dirname, 'uploads', 'image.json');
 const DATA_FILE_PATH2 = path.join(__dirname, 'uploads', 'tempdataset.json');
 const DATASET_PATH = path.join(__dirname, 'uploads', 'dataset');
+
+/* C++ CALL FUNCTION */
+const myLibrary = ffi.Library('colorSearch', {
+  'add': ['int', ['int', 'int']]
+});
+// const result = myLibrary.add(2, 3); example of function call
 
 
 app.get("/api/home", (req, res) => {
