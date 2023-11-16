@@ -7,7 +7,7 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 
 const app = express();
-const ffi = require('ffi-napi');
+// const ffi = require('ffi-napi');
 const PORT = 8080;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -16,11 +16,10 @@ const DATA_FILE_PATH2 = path.join(__dirname, 'uploads', 'tempdataset.json');
 const DATASET_PATH = path.join(__dirname, 'uploads', 'dataset');
 
 /* C++ CALL FUNCTION */
-const myLibrary = ffi.Library('colorSearch', {
-  'add': ['int', ['int', 'int']]
-});
+// const myLibrary = ffi.Library('colorSearch', {
+//   'add': ['int', ['int', 'int']]
+// });
 // const result = myLibrary.add(2, 3); example of function call
-
 
 app.get("/api/home", (req, res) => {
     res.json({ message: "Hello World!" });
@@ -252,5 +251,35 @@ app.delete("/api/reset-temp", async (req, res) => {
       }
     });
   } catch (error) {
+  }
+});
+
+app.post('/api/upload-screenshot', async (req, res) => {
+  try {
+    const base64Data = req.body.screenshot;
+    if (!base64Data) {
+      throw new Error('No screenshot data provided.');
+    }
+
+    const timestamp = Date.now();
+    const fileName = `screenshot_${timestamp}.jpg`;
+    const filePath = path.join(__dirname, 'uploads', fileName);
+
+    // Write the base64 data to the file system
+    await fs.writeFile(filePath, base64Data, { encoding: 'base64' });
+
+    // Call the /api/upload-img endpoint internally to handle the image upload
+    await fetch('http://localhost:8080/api/upload-img', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ file: fileName }),
+    });
+
+    res.json({ message: 'Screenshot uploaded successfully', fileName });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });

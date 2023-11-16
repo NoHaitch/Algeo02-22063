@@ -1,10 +1,12 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import Webcam from "react-webcam";
 import { motion } from "framer-motion";
 import GetAllImgItems from "@/components/getAllImgItems";
 import DatasetNoquery from "../../../../server/uploads/dataset.json";
+import {saveAs} from "file-saver";
 
 export default function App() {
   const imgCount = DatasetNoquery.length;
@@ -14,9 +16,13 @@ export default function App() {
   const currentImgShownRef = useRef<HTMLImageElement>(null);
   const currentImgLabelRef = useRef<HTMLLabelElement>(null);
 
-  const [toggle, setToggle] = useState<boolean>(false);
+  const [toggleColorTexture, setToggleColorTexture] = useState<boolean>(false);
+  const [toggleCamera, setToggleCamera] = useState<boolean>(false);
+  const [toggleCapture, setToggleCapture] = useState<boolean>(false);
+  const [toggleAutoSearch, setToggleAutoSearch] = useState<boolean>(false);
   const [havequery, setHavequery] = useState<boolean>(false);
   const [isSearching, setIsSeaching] = useState<boolean>(false);
+  const [captureInterval, setCaptureInterval] = useState<number>(5);
 
   const [currentData, setData] = useState({
     selectedDataset: "",
@@ -31,6 +37,7 @@ export default function App() {
     const imgInput = imgInputRef.current;
     const currentImgShown = currentImgShownRef.current;
     const currentImgLabel = currentImgLabelRef.current;
+    const webcamRef = useRef<Webcam>(null);
     const file = imgInput?.files?.[0];
 
     if (!file) {
@@ -158,7 +165,7 @@ export default function App() {
     } else {
       setIsSeaching(true);
       setHavequery(true);
-      if (toggle) {
+      if (toggleColorTexture) {
         // Color search
         console.log("color search");
       } else {
@@ -244,6 +251,77 @@ export default function App() {
     }, 5000); // Adjust the timeout as needed
   };
 
+  /* CAMERA */
+  const handleCameraSearch = async () =>{
+    setToggleCapture(false);
+    saveScreenshot(base64);
+    try {
+      const response = await fetch('http://localhost:8080/api/upload-screenshot', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ screenshot }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data.message);
+      } else {
+        console.error('Failed to upload screenshot');
+      }
+    } catch (error) {
+      console.error('Error uploading screenshot:', error);
+    }
+  }
+
+  const webcamRef = useRef<Webcam>(null);
+  const [screenshot, setScreenshot] = useState<string | null>(null);
+  const [webcamError, setWebcamError] = useState<boolean>(false);
+
+  useEffect(() => {
+    const captureScreenshot = async () => {
+      if (toggleCapture && webcamRef.current) {
+        try {
+          const base64 = webcamRef.current.getScreenshot();
+          setScreenshot(base64);
+          setWebcamError(false);
+
+          // saveScreenshot(base64);
+        } catch (error) {
+          console.error("Error accessing webcam:", error);
+          setWebcamError(true);
+        }
+      }
+    };
+
+    // Capture a screenshot initially
+    captureScreenshot();
+
+    // Set up interval to capture a screenshot every 5 seconds
+    const intervalId = setInterval(captureScreenshot, (captureInterval! *1000));
+
+    // Cleanup interval on component unmount
+    return () => clearInterval(intervalId);
+  }, [toggleCapture]);
+
+  const saveScreenshot = (base64: string) => {
+    const blob = base64ToBlob(base64);
+    saveAs(blob, "screenshot.png");
+  };
+
+  const base64ToBlob = (base64: string): Blob => {
+    const byteCharacters = atob(base64.split(",")[1]);
+    const byteNumbers = new Array(byteCharacters.length);
+
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+
+    const byteArray = new Uint8Array(byteNumbers);
+    return new Blob([byteArray], { type: "image/png" });
+  };
+
   return (
     <>
       <header>
@@ -262,7 +340,11 @@ export default function App() {
           </Link>
         </motion.div>
       </header>
-      <main className={`flex flex-col justify-center items-center select-none ${isUploading ? ("overflow-hidden") : ""}`}>
+      <main
+        className={`flex flex-col justify-center items-center select-none ${
+          isUploading ? "overflow-hidden" : ""
+        }`}
+      >
         <motion.div
           initial={{ opacity: 0, y: -200 }}
           animate={{ opacity: 1, y: 0 }}
@@ -282,122 +364,297 @@ export default function App() {
               <h2 className="text-base">Bjir Anak Nopal. Kelompok 23.</h2>
             </div>
           </div>
-          <div className="grid grid-cols-2 items-center p-4">
-            <div className="flex flex-col items-center space-y-4 m-5">
-              <input
-                type="file"
-                ref={imgInputRef}
-                className="hidden"
-                id="imgInput"
-                onChange={handleImgInputChange}
+          <div className="-mr-5 text-l font-bold flex flex-row space-x-3 mt-5">
+            <h3 className={`${toggleCamera ? "text-[--primary]" : ""}`}>
+              Manual
+            </h3>
+            <div
+              onClick={() => setToggleCamera(!toggleCamera)}
+              className={`flex h-7 w-14 cursor-pointer rounded-full border-2  border-[--primary] ${
+                toggleCamera
+                  ? "justify-start bg-white"
+                  : "justify-end bg-[--primary]"
+              } p-[2px] `}
+            >
+              <motion.div
+                className={`h-5 w-5 rounded-full ${
+                  toggleCamera ? "bg-[--primary]" : "bg-white"
+                }`}
+                layout
+                transition={{ type: "spring", stiffness: 700, damping: 30 }}
               />
-              <input
-                type="file"
-                ref={datasetInputRef}
-                // @ts-ignore
-                directory=""
-                webkitdirectory=""
-                className="hidden"
-                id="datasetInput"
-                onChange={handleDatasetInputChange}
-              />
-              <div className="flex flex-col items-center space-y-2">
-                <div className="flex flex-row">
-                  <div className="flex flex-col">
+            </div>
+            <h3 className={`${!toggleCamera ? "text-[--primary]" : ""}`}>
+              WebCamera
+            </h3>
+          </div>
+          {toggleCamera ? (
+            <div className="flex flex-col justify-center items-center font-bold space-y-2">
+              <div className="grid grid-cols-2 items-center p-4">
+                <div className="flex flex-col items-center space-y-4 m-5">
+                  <input
+                    type="file"
+                    ref={imgInputRef}
+                    className="hidden"
+                    id="imgInput"
+                    onChange={handleImgInputChange}
+                  />
+                  <input
+                    type="file"
+                    ref={datasetInputRef}
+                    // @ts-ignore
+                    directory=""
+                    webkitdirectory=""
+                    className="hidden"
+                    id="datasetInput"
+                    onChange={handleDatasetInputChange}
+                  />
+                  <div className="flex flex-col items-center space-y-2">
+                    <div className="flex flex-row">
+                      <div className="flex flex-col">
+                        <button
+                          onClick={openDatasetSelect}
+                          className="h-[50px] relative inline-flex items-center justify-center p-4 px-5 py-3 overflow-hidden font-medium text-indigo-600 transition duration-300 ease-out rounded-full shadow-xl group hover:ring-1 hover:ring-purple-500"
+                        >
+                          <span className="absolute inset-0 w-full h-full bg-gradient-to-br from-blue-600 via-purple-600 to-pink-700"></span>
+                          <span className="absolute bottom-0 right-0 block w-64 h-64 mb-32 mr-4 transition duration-500 origin-bottom-left transform rotate-45 translate-x-24 bg-pink-500 rounded-full opacity-30 group-hover:rotate-90 ease"></span>
+                          <span className="relative text-white">
+                            Select DataSet Folder
+                          </span>
+                        </button>
+                        <h1 className="text-center font-normal text-sm">
+                          {currentData.selectedDataset}
+                        </h1>
+                      </div>
+                      <button
+                        onClick={handleDatasetUpload}
+                        className="ml-2 h-[50px] relative inline-flex items-center justify-center p-4 px-5 py-3 overflow-hidden font-medium text-indigo-600 transition duration-300 ease-out rounded-full shadow-xl group hover:ring-1 hover:ring-purple-500"
+                      >
+                        <span className="absolute inset-0 w-full h-full bg-gradient-to-br from-blue-600 via-purple-600 to-pink-700"></span>
+                        <span className="absolute bottom-0 right-0 block w-64 h-64 mb-32 mr-4 transition duration-500 origin-bottom-left transform rotate-45 translate-x-24 bg-pink-500 rounded-full opacity-30 group-hover:rotate-90 ease"></span>
+                        <span className="relative text-white">Upload</span>
+                        <svg
+                          className="ml-2 w-5 h-5 z-[10]"
+                          fill="none"
+                          stroke="white"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M14 5l7 7m0 0l-7 7m7-7H3"
+                          ></path>
+                        </svg>
+                      </button>
+                    </div>
+                    <div className="flex flex-col mt-2">
+                      <button
+                        onClick={openImgSelect}
+                        className="relative inline-flex items-center justify-center p-4 px-5 py-3 overflow-hidden font-medium text-indigo-600 transition duration-300 ease-out rounded-full shadow-xl group hover:ring-1 hover:ring-purple-500"
+                      >
+                        <span className="absolute inset-0 w-full h-full bg-gradient-to-br from-blue-600 via-purple-600 to-pink-700"></span>
+                        <span className="absolute bottom-0 right-0 block w-64 h-64 mb-32 mr-4 transition duration-500 origin-bottom-left transform rotate-45 translate-x-24 bg-pink-500 rounded-full opacity-30 group-hover:rotate-90 ease"></span>
+                        <span className="relative text-white">
+                          Insert Image
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+                  <div className="-mr-5 text-l font-bold flex flex-row space-x-3 mt-5">
+                    <h3
+                      className={`${
+                        toggleColorTexture ? "text-[--primary]" : ""
+                      }`}
+                    >
+                      Color
+                    </h3>
+
+                    <div
+                      onClick={() => setToggleColorTexture(!toggleColorTexture)}
+                      className={`flex h-7 w-14 cursor-pointer rounded-full border-2  border-[--primary] ${
+                        toggleColorTexture
+                          ? "justify-start bg-white"
+                          : "justify-end bg-[--primary]"
+                      } p-[2px] `}
+                    >
+                      <motion.div
+                        className={`h-5 w-5 rounded-full ${
+                          toggleColorTexture ? "bg-[--primary]" : "bg-white"
+                        }`}
+                        layout
+                        transition={{
+                          type: "spring",
+                          stiffness: 700,
+                          damping: 30,
+                        }}
+                      />
+                    </div>
+                    <h3
+                      className={`${
+                        !toggleColorTexture ? "text-[--primary]" : ""
+                      }`}
+                    >
+                      Texture
+                    </h3>
+                  </div>
+                </div>
+                <div className="text-center text-slate-600 m-5">
+                  <img
+                    ref={currentImgShownRef}
+                    src="/placeholder.jpg"
+                    height={400}
+                    width={400}
+                    alt="Picture of the author"
+                    className="rounded-[25px] drop-shadow-[4px_4px_2.5px_#000] border-2 border-[--trinary] bg-gray-300"
+                  />
+                  <label ref={currentImgLabelRef}>file.jpg</label>
+                </div>
+              </div>
+              <div className="button">
+                <button
+                  onClick={handleSearchImage}
+                  className="relative inline-flex items-center justify-center p-4 px-5 py-3 overflow-hidden font-medium text-indigo-600 transition duration-300 ease-out rounded-full shadow-xl group hover:ring-1 hover:ring-purple-500"
+                >
+                  <span className="absolute inset-0 w-full h-full bg-gradient-to-br from-blue-600 via-purple-600 to-pink-700"></span>
+                  <span className="absolute bottom-0 right-0 block w-64 h-64 mb-32 mr-4 transition duration-500 origin-bottom-left transform rotate-45 translate-x-24 bg-pink-500 rounded-full opacity-30 group-hover:rotate-90 ease"></span>
+                  <span className="relative text-white">Search</span>
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center text-center">
+              <div className="flex flex-col items-center">
+              <div className="flex flex-row items-center space-x-8 m-5">
+      <div className="">
+        <h2 className="text-center">Webcam</h2>
+        {webcamError ? (
+          <div className="w-[400px] h-[300px] bg-gray-300"></div>
+        ) : (
+          <Webcam
+            audio={false}
+            ref={webcamRef}
+            screenshotFormat="image/png"
+            className="w-[400px] h-auto rounded-[5px] border-2 border-[--trinary] bg-gray-300 "
+          />
+        )}
+      </div>
+      {screenshot && !webcamError && (
+        <div>
+          <h2 className="text-center">Current Screenshot</h2>
+          <img
+            src={screenshot}
+            alt="Latest Screenshot"
+            className="w-[400px] h-auto rounded-[25px] drop-shadow-[4px_4px_2.5px_#000] border-4 border-[--primary] bg-gray-300 "
+          />
+        </div>
+      )}
+    </div>
+                <div className="flex flex-col items-center">
+                  <div className="flex flex-row m-2 text-center justify-center items-center">
+                    <h1>Capture Interval</h1>
+                    <input
+                      type="number"
+                      step="0.1"
+                      min="2"
+                      max="20"
+                      disabled={toggleCapture}
+                      value={captureInterval}
+                      className={`m-2 border-2 border-black w-[64px] text-center ${
+                        toggleCapture ? "bg-slate-400" : ""
+                      }`}
+                      onChange={(e) => {
+                        const newInterval = parseFloat(e.target.value);
+                        setCaptureInterval(
+                          !isNaN(newInterval) && newInterval >= 0
+                            ? newInterval
+                            : 0.1
+                        );
+                      }}
+                      // Add this onBlur event to prevent issues with decimal input
+                      onBlur={(e) => {
+                        const newInterval = parseFloat(e.target.value);
+                        setCaptureInterval(
+                          !isNaN(newInterval) && newInterval >= 0
+                            ? newInterval
+                            : 0.1
+                        );
+                      }}
+                    />
+                    <h1>second</h1>
+                  </div>
+                  <div className="space-x-3 m-2">
                     <button
-                      onClick={openDatasetSelect}
-                      className="h-[50px] relative inline-flex items-center justify-center p-4 px-5 py-3 overflow-hidden font-medium text-indigo-600 transition duration-300 ease-out rounded-full shadow-xl group hover:ring-1 hover:ring-purple-500"
+                      onClick={() => setToggleCapture(true)}
+                      className="ml-2 h-[50px] relative inline-flex items-center justify-center p-4 px-5 py-3 overflow-hidden font-medium text-indigo-600 transition duration-300 ease-out rounded-full shadow-xl group hover:ring-1 hover:ring-purple-500"
                     >
                       <span className="absolute inset-0 w-full h-full bg-gradient-to-br from-blue-600 via-purple-600 to-pink-700"></span>
                       <span className="absolute bottom-0 right-0 block w-64 h-64 mb-32 mr-4 transition duration-500 origin-bottom-left transform rotate-45 translate-x-24 bg-pink-500 rounded-full opacity-30 group-hover:rotate-90 ease"></span>
-                      <span className="relative text-white">
-                        Select DataSet Folder
-                      </span>
+                      <span className="relative text-white">Start Capture</span>
                     </button>
-                    <h1 className="text-center font-normal text-sm">
-                      {currentData.selectedDataset}
-                    </h1>
-                  </div>
-                  <button
-                    onClick={handleDatasetUpload}
-                    className="ml-2 h-[50px] relative inline-flex items-center justify-center p-4 px-5 py-3 overflow-hidden font-medium text-indigo-600 transition duration-300 ease-out rounded-full shadow-xl group hover:ring-1 hover:ring-purple-500"
-                  >
-                    <span className="absolute inset-0 w-full h-full bg-gradient-to-br from-blue-600 via-purple-600 to-pink-700"></span>
-                    <span className="absolute bottom-0 right-0 block w-64 h-64 mb-32 mr-4 transition duration-500 origin-bottom-left transform rotate-45 translate-x-24 bg-pink-500 rounded-full opacity-30 group-hover:rotate-90 ease"></span>
-                    <span className="relative text-white">Upload</span>
-                    <svg
-                      className="ml-2 w-5 h-5 z-[10]"
-                      fill="none"
-                      stroke="white"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
+                    <button
+                      onClick={() => setToggleCapture(false)}
+                      className="ml-2 h-[50px] relative inline-flex items-center justify-center p-4 px-5 py-3 overflow-hidden font-medium text-indigo-600 transition duration-300 ease-out rounded-full shadow-xl group hover:ring-1 hover:ring-purple-500"
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M14 5l7 7m0 0l-7 7m7-7H3"
-                      ></path>
-                    </svg>
-                  </button>
-                </div>
-                <div className="flex flex-col mt-2">
-                  <button
-                    onClick={openImgSelect}
-                    className="relative inline-flex items-center justify-center p-4 px-5 py-3 overflow-hidden font-medium text-indigo-600 transition duration-300 ease-out rounded-full shadow-xl group hover:ring-1 hover:ring-purple-500"
-                  >
-                    <span className="absolute inset-0 w-full h-full bg-gradient-to-br from-blue-600 via-purple-600 to-pink-700"></span>
-                    <span className="absolute bottom-0 right-0 block w-64 h-64 mb-32 mr-4 transition duration-500 origin-bottom-left transform rotate-45 translate-x-24 bg-pink-500 rounded-full opacity-30 group-hover:rotate-90 ease"></span>
-                    <span className="relative text-white">Insert Image</span>
-                  </button>
+                      <span className="absolute inset-0 w-full h-full bg-gradient-to-br from-blue-600 via-purple-600 to-pink-700"></span>
+                      <span className="absolute bottom-0 right-0 block w-64 h-64 mb-32 mr-4 transition duration-500 origin-bottom-left transform rotate-45 translate-x-24 bg-pink-500 rounded-full opacity-30 group-hover:rotate-90 ease"></span>
+                      <span className="relative text-white">Stop Capture</span>
+                    </button>
+                  </div>
+                  <div className="flex flex-row space-x-3 m-2 justify-center">
+                    <div className="text-l font-bold flex flex-row space-x-3 items-center">
+                      <h3
+                        className={`${
+                          toggleAutoSearch ? "text-purple-600" : ""
+                        }`}
+                      >
+                        Manual
+                      </h3>
+                      <div
+                        onClick={() => setToggleAutoSearch(!toggleAutoSearch)}
+                        className={`flex h-7 w-14 cursor-pointer rounded-full border-2  border-purple-600 ${
+                          toggleAutoSearch
+                            ? "justify-start bg-white"
+                            : "justify-end bg-purple-600"
+                        } p-[2px] `}
+                      >
+                        <motion.div
+                          className={`h-5 w-5 rounded-full ${
+                            toggleAutoSearch ? " bg-purple-600" : "bg-white"
+                          }`}
+                          layout
+                          transition={{
+                            type: "spring",
+                            stiffness: 700,
+                            damping: 30,
+                          }}
+                        />
+                      </div>
+                      <h3
+                        className={`${
+                          !toggleAutoSearch ? "text-purple-600" : ""
+                        }`}
+                      >
+                        Automatic
+                      </h3>
+                    </div>
+                    <div className={!toggleAutoSearch ? "opacity-10" : ""}>
+                      <button
+                        onClick={() => handleCameraSearch()}
+                        disabled={!toggleAutoSearch}
+                        className="ml-2 h-[50px] relative inline-flex items-center justify-center p-4 px-5 py-3 overflow-hidden font-medium text-indigo-600 transition duration-300 ease-out rounded-full shadow-xl group hover:ring-1 hover:ring-purple-500"
+                      >
+                        <span className="absolute inset-0 w-full h-full bg-gradient-to-br from-blue-600 via-purple-600 to-pink-700"></span>
+                        <span className="absolute bottom-0 right-0 block w-64 h-64 mb-32 mr-4 transition duration-500 origin-bottom-left transform rotate-45 translate-x-24 bg-pink-500 rounded-full opacity-30 group-hover:rotate-90 ease"></span>
+                        <span className="relative text-white">Search</span>
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div className="-mr-5 text-l font-bold flex flex-row space-x-3 mt-5">
-                <h3 className={`${toggle ? "text-[--primary]" : ""}`}>Color</h3>
-
-                <div
-                  onClick={() => setToggle(!toggle)}
-                  className={`flex h-7 w-14 cursor-pointer rounded-full border-2  border-[--primary] ${
-                    toggle
-                      ? "justify-start bg-white"
-                      : "justify-end bg-[--primary]"
-                  } p-[2px] `}
-                >
-                  <motion.div
-                    className={`h-5 w-5 rounded-full ${
-                      toggle ? "bg-[--primary]" : "bg-white"
-                    }`}
-                    layout
-                    transition={{ type: "spring", stiffness: 700, damping: 30 }}
-                  />
-                </div>
-                <h3 className={`${!toggle ? "text-[--primary]" : ""}`}>
-                  Texture
-                </h3>
-              </div>
             </div>
-            <div className="text-center text-slate-600 m-5">
-              <img
-                ref={currentImgShownRef}
-                src="/placeholder.jpg"
-                height={400}
-                width={400}
-                alt="Picture of the author"
-                className="rounded-[25px] drop-shadow-[4px_4px_2.5px_#000] border-2 border-[--trinary] bg-gray-300"
-              />
-              <label ref={currentImgLabelRef}>file.jpg</label>
-            </div>
-          </div>
-          <div className="button">
-            <button
-              onClick={handleSearchImage}
-              className="relative inline-flex items-center justify-center p-4 px-5 py-3 overflow-hidden font-medium text-indigo-600 transition duration-300 ease-out rounded-full shadow-xl group hover:ring-1 hover:ring-purple-500"
-            >
-              <span className="absolute inset-0 w-full h-full bg-gradient-to-br from-blue-600 via-purple-600 to-pink-700"></span>
-              <span className="absolute bottom-0 right-0 block w-64 h-64 mb-32 mr-4 transition duration-500 origin-bottom-left transform rotate-45 translate-x-24 bg-pink-500 rounded-full opacity-30 group-hover:rotate-90 ease"></span>
-              <span className="relative text-white">Search</span>
-            </button>
-          </div>
+          )}
           {currentData.dataset != "" && (
             <div className="font-bold text-[--trinary] p-5 text-center">
               <h2>Dataset : {currentData.dataset}</h2>
@@ -492,7 +749,11 @@ export default function App() {
           </button>
         </div>
       </main>
-      {!isUploading && (!isSearching ? (<GetAllImgItems query={havequery} />) : <div role="status">
+      {!isUploading &&
+        (!isSearching ? (
+          <GetAllImgItems query={havequery} />
+        ) : (
+          <div role="status">
             <div className="top-0 left-0 flex flex-col justify-center items-center z-[10] ">
               <div role="status">
                 <svg
@@ -514,7 +775,8 @@ export default function App() {
               </div>
               <h1 className=" m-4 text-xl">Loading . . .</h1>
             </div>
-          </div>)}
+          </div>
+        ))}
       <button onClick={handleImgUpload} className="hidden"></button>
       <button onClick={handleDatasetUpload} className="hidden"></button>
       <div className="absolute left-0 top-0 app-body-background h-screen w-full z-[-20]"></div>
