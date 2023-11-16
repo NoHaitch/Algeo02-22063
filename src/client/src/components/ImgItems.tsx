@@ -16,6 +16,11 @@ export default function ImgItems({
     cosine: number;
     path: string;
   };
+  const formatPercentage = (value: number): string => {
+    // Convert the cosine value to a percentage with two decimal points
+    const percentage = (value).toFixed(2);
+    return `${percentage}%`;
+  };
   return (
     <>
       <div className="grid grid-cols-4 grid-rows-2 w-full my-4">
@@ -35,7 +40,7 @@ export default function ImgItems({
                       className="max-h-[280px] max-w-[280px]"
                     />
                   </div>
-                  <h1 className="mb-4">{cosine}</h1>
+                  <h1 className="mb-4">{formatPercentage(cosine)}</h1>
                 </div>
               ))
           : imgData
@@ -51,7 +56,7 @@ export default function ImgItems({
                       className="max-h-[280px] max-w-[280px]"
                     />
                   </div>
-                  <h1>0.00</h1>
+                  <h1>0.00%</h1>
                 </div>
               ))}
       </div>
