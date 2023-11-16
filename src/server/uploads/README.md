@@ -1,1 +1,1 @@
-## THIS IS WHERE THE UPLOADED FILE ARE PLACED
+## This folder is for all the the files uploaded
