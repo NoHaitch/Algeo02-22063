@@ -4,8 +4,11 @@ import Link from "next/link";
 import { useRef, useState } from "react";
 import { motion } from "framer-motion";
 import GetAllImgItems from "@/components/getAllImgItems";
+import DatasetNoquery from "../../../../server/uploads/dataset.json";
 
 export default function App() {
+  const imgCount = DatasetNoquery.length;
+
   const imgInputRef = useRef<HTMLInputElement>(null);
   const datasetInputRef = useRef<HTMLInputElement>(null);
   const currentImgShownRef = useRef<HTMLImageElement>(null);
@@ -264,7 +267,7 @@ export default function App() {
           initial={{ opacity: 0, y: -200 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
-          className="flex flex-col justify-center items-center font-bold space-y-5 m-5"
+          className="flex flex-col justify-center items-center font-bold space-y-5 -mt-4 m-5 p-8"
         >
           <div className="title flex flex-row select-none">
             <Image
