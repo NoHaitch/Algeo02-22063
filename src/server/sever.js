@@ -1,28 +1,17 @@
-process.setMaxListeners(100);
+process.setMaxListeners(Infinity);
 const express = require("express");
 const cors = require("cors");
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs/promises");
 const addon = require("./build/Release/addon");
-const { fileURLToPath } = require("url");
-const { dirname } = require("path");
+
 
 const app = express();
 const PORT = 8080;
 const DATA_FILE_PATH1 = path.join(__dirname, "uploads", "image.json");
 const DATA_FILE_PATH2 = path.join(__dirname, "uploads", "tempdataset.json");
 const DATASET_PATH = path.join(__dirname, "uploads", "dataset");
-
-function runTextureSearchTest() {
-  const imagePath = 'path/to/your/image.jpg'; // Replace with the actual image path
-  const result = addon.textureSearch(imagePath);
-
-  console.log(`Texture search for ${imagePath}`);
-  console.log(`Time taken: ${result} milliseconds`);
-}
-runTextureSearchTest();
-
 
 app.listen(PORT, () => {
   console.log(`Server started on port ${PORT}`);
@@ -109,14 +98,14 @@ app.post("/api/upload-img", ImgUpload.array("file"), async (req, res) => {
         : [];
 
       // Delete the image before the newly uploaded image
-      if (existingImages.length > 1) {
-        const imageToDelete = existingImages[existingImages.length - 2];
+      if (existingImages.length > 0) {
+        const imageToDelete = existingImages[0]; // Change this line
         await fs.unlink(path.join(__dirname, "uploads", imageToDelete));
         // DELETE THE IMAGE
       }
 
-      // Append the current image to the list of uploaded images
-      existingImages.push(lastUploadedFileName);
+      // Insert the current image at the beginning of the list
+      existingImages.unshift(lastUploadedFileName);
 
       // Store the updated list in the JSON file
       await fs.writeFile(uploadedImagesPath, JSON.stringify(existingImages));
@@ -178,7 +167,7 @@ app.delete("/api/delete-last-image", async (req, res) => {
       const lastUploadedFileName = existingImages.pop();
 
       // Delete the last uploaded image
-      await fs.unlink(path.join(__dirname, "uploads", lastUploadedFileName));
+      await fs.rm(path.join(__dirname, "uploads", lastUploadedFileName));
 
       // Store the updated list in the JSON file
       await fs.writeFile(uploadedImagesPath, JSON.stringify(existingImages));
@@ -251,7 +240,7 @@ app.delete("/api/reset-temp", async (req, res) => {
 
   try {
     await fs.access(path.join(__dirname, "uploads", "tempdataset.json"));
-    await fs.unlink(
+    await fs.rm(
       path.join(__dirname, "uploads", "tempdataset.json"),
       (error) => {
         if (error) {
@@ -295,14 +284,16 @@ app.post("/api/upload-screenshot", async (req, res) => {
 });
 
 app.post("/api/search-texture", async (req, res) => {
+  const fileName = DATA_FILE_PATH1;
+  console.log(fileName);
   try {
-    const time = myLibrary.textureSearch();
+    const time = await runTextureSearchTest('uploads/' + fileName);
     res.json({ time });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
   }
-});
+})
 
 app.post("/api/search-color", async (req, res) => {
   try {
@@ -313,3 +304,20 @@ app.post("/api/search-color", async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
+function runTextureSearchTest(path) {
+  const imagePath = path; // Replace with the actual image path
+  try {
+    // Check if the dataset folder exists, and create it if it doesn't
+    fs.access(imagePath);
+    new Error("Invalid file type. Only images are allowed.")    
+  } catch (error) {
+    new Error("Invalid file type. Only images are allowed.")    
+  }
+
+  // Call the textureSearch function
+  const result = addon.textureSearch(imagePath);
+
+  console.log(`Texture search for ${imagePath}`);
+  console.log(`Time taken: ${result} milliseconds`);
+}

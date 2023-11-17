@@ -5,8 +5,9 @@ import { useEffect, useRef, useState } from "react";
 import Webcam from "react-webcam";
 import { motion } from "framer-motion";
 import GetAllImgItems from "@/components/getAllImgItems";
-import DatasetNoquery from "../../../../server/uploads/dataset.json";
 import { saveAs } from "file-saver";
+import DatasetNoquery from "../../../../server/uploads/dataset.json";
+import ImgQuery from "../../../../server/uploads/image.json";
 
 export default function App() {
   const imgCount = DatasetNoquery.length;
@@ -160,13 +161,13 @@ export default function App() {
   };
 
   const handleSearchImage = async () => {
-    if (currentData.dataset == "") {
+    if (imgCount == 0) {
       createDangerAlert("Dataset is empty. Please upload a dataset");
     } else if (currentData.image == "") {
       createDangerAlert("No image to query. Please insert an image.");
     } else {
       setIsSeaching(true);
-      setHavequery(true);
+      //setHavequery(true);
       if (toggleColorTexture) {
         // Color search
         console.log("color search");
@@ -174,7 +175,7 @@ export default function App() {
       } else {
         // Texture search
         console.log("texture search");
-        handleTextureSearch();
+        const time = await handleTextureSearch();
       }
       setIsSeaching(false);
     }
@@ -182,16 +183,22 @@ export default function App() {
 
   const handleTextureSearch = async () => {
     try {
-      const response = await fetch("/api/search-texture", {
+      const fileImgName = ImgQuery[0];
+      const time = await fetch("http://127.0.0.1:8080/api/search-texture", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-      });
-      const data = await response.json();
-      setSearchTime(data.time);
+        body: JSON.stringify({}),
+      }).then((response) => response.json());
+
+      console.log(`Texture search for file ${fileImgName} response:`, { time });
+
+      console.log(
+        `Texture search for file ${fileImgName} took ${time} milliseconds`
+      );
     } catch (error) {
-      console.error(error);
+      console.error("Error in texture search:", error);
     }
   };
 
@@ -289,10 +296,7 @@ export default function App() {
   const handleCameraSearch = async () => {
     setToggleCapture(false);
     saveScreenshot();
-
   };
-
-  
 
   useEffect(() => {
     const captureScreenshot = async () => {
@@ -335,7 +339,7 @@ export default function App() {
     }
 
     const byteArray = new Uint8Array(byteNumbers);
-    
+
     return new Blob([byteArray], { type: "image/png" });
   };
 
@@ -674,7 +678,10 @@ export default function App() {
           )}
           {imgCount > 0 && (
             <div className="font-bold text-[--trinary] p-5 text-center">
-              <h2>Dataset : {currentData.dataset != "" ? currentData.dataset : "default"}</h2>
+              <h2>
+                Dataset :{" "}
+                {currentData.dataset != "" ? currentData.dataset : "default"}
+              </h2>
             </div>
           )}
         </motion.div>

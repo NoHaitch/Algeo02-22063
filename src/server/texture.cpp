@@ -38,7 +38,6 @@ vector<vector<double>> grayscale(const vector<vector<vector<int>>>& img) {
 vector<vector<double>> imagetoGray(const string& path) {
     int width, height, channels;
     unsigned char *image = stbi_load(path.c_str(), &width, &height, &channels, 0);
-
     if (!image) {
         cerr << "Error loading image" << endl;
         return vector<vector<double>>();
@@ -321,20 +320,16 @@ void sortResult(Result *a) {
     }
 }
 
-// #include <node.h>
-// using namespace v8;
+#include <node.h>
+using namespace v8;
 
-int textureSearch(string fileName){
-    return 10;
-}
-
-int temp(string fileName) { 
+int textureSearch(string fileName) { 
     // string fileName;
     string folderPath;
     auto start = chrono::high_resolution_clock::now();
     folderPath = "uploads/dataset/";
 //    cout << folderPath + fileName;
-    vector<vector<double>> img1 = imagetoGray(fileName);
+    vector<vector<double>> img1 = imagetoGray(folderPath + fileName);
     vector<vector<double>> glcmimage1 = glcm(img1);
     auto *hasil = new Result;
     queryAllImage(glcmimage1, folderPath, hasil);
@@ -361,18 +356,18 @@ int temp(string fileName) {
 }
 
 
-// void Initialize(Local<Object> exports) {
-//   NODE_SET_METHOD(exports, "textureSearch", [](const FunctionCallbackInfo<Value>& args) {
-//     Isolate* isolate = args.GetIsolate();
-//     const char* input = "example"; // Replace with actual input
-//     int result = textureSearch(input);
-//     args.GetReturnValue().Set(Number::New(isolate, result));
-//   });
-// }
-
-// NODE_MODULE(NODE_GYP_MODULE_NAME, Initialize)
-
-
-int main(){
-    cout << temp("uploads/7.jpg");
+void Initialize(Local<Object> exports) {
+  NODE_SET_METHOD(exports, "textureSearch", [](const FunctionCallbackInfo<Value>& args) {
+    Isolate* isolate = args.GetIsolate();
+    const char* input = "example"; // Replace with actual input
+    int result = textureSearch(input);
+    args.GetReturnValue().Set(Number::New(isolate, result));
+  });
 }
+
+NODE_MODULE(NODE_GYP_MODULE_NAME, Initialize)
+
+
+// int main(){
+//     cout << textureSearch("uploads/7.jpg");
+// }
