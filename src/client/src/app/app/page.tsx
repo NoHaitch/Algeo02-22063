@@ -15,6 +15,7 @@ export default function App() {
   const datasetInputRef = useRef<HTMLInputElement>(null);
   const currentImgShownRef = useRef<HTMLImageElement>(null);
   const currentImgLabelRef = useRef<HTMLLabelElement>(null);
+  const webcamRef = useRef<Webcam>(null);
 
   const [toggleColorTexture, setToggleColorTexture] = useState<boolean>(false);
   const [toggleCamera, setToggleCamera] = useState<boolean>(true);
@@ -24,7 +25,8 @@ export default function App() {
   const [isSearching, setIsSeaching] = useState<boolean>(false);
   const [captureInterval, setCaptureInterval] = useState<number>(5);
   const [searchTime, setSearchTime] = useState<number | null>(null);
-
+  const [screenshot, setScreenshot] = useState<string | null>(null);
+  const [webcamError, setWebcamError] = useState<boolean>(false);
   const [currentData, setData] = useState({
     selectedDataset: "",
     image: "",
@@ -38,7 +40,6 @@ export default function App() {
     const imgInput = imgInputRef.current;
     const currentImgShown = currentImgShownRef.current;
     const currentImgLabel = currentImgLabelRef.current;
-    const webcamRef = useRef<Webcam>(null);
     const file = imgInput?.files?.[0];
 
     if (!file) {
@@ -291,9 +292,7 @@ export default function App() {
 
   };
 
-  const webcamRef = useRef<Webcam>(null);
-  const [screenshot, setScreenshot] = useState<string | null>(null);
-  const [webcamError, setWebcamError] = useState<boolean>(false);
+  
 
   useEffect(() => {
     const captureScreenshot = async () => {
@@ -673,9 +672,9 @@ export default function App() {
               </div>
             </div>
           )}
-          {currentData.dataset != "" && (
+          {imgCount > 0 && (
             <div className="font-bold text-[--trinary] p-5 text-center">
-              <h2>Dataset : {currentData.dataset}</h2>
+              <h2>Dataset : {currentData.dataset != "" ? currentData.dataset : "default"}</h2>
             </div>
           )}
         </motion.div>
