@@ -272,7 +272,7 @@ void queryAllImage(vector<vector<double>> glcmimage1, const string& path, Result
     for (auto& p : filesystem::directory_iterator(path)) {
         auto *matQuery = new vector<vector<double>>;
         auto *matQueryGLCM = new vector<vector<double>>;
-        *matQuery = imagetoGray(p.path().filename().string());
+        *matQuery = imagetoGray(path + p.path().filename().string());
         *matQueryGLCM = glcm(*matQuery);
         float cos = cosine(glcmimage1, *matQueryGLCM);
         if (cos >= 60) {
@@ -333,8 +333,8 @@ int temp(string fileName) {
     string folderPath;
     auto start = chrono::high_resolution_clock::now();
     folderPath = "uploads/dataset/";
-    cout << folderPath + fileName;
-    vector<vector<double>> img1 = imagetoGray(folderPath + fileName);
+//    cout << folderPath + fileName;
+    vector<vector<double>> img1 = imagetoGray(fileName);
     vector<vector<double>> glcmimage1 = glcm(img1);
     auto *hasil = new Result;
     queryAllImage(glcmimage1, folderPath, hasil);
@@ -374,5 +374,5 @@ int temp(string fileName) {
 
 
 int main(){
-    cout << temp("7.jpg");
+    cout << temp("uploads/7.jpg");
 }
