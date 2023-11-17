@@ -148,7 +148,7 @@ app.post("/api/upload-data", dataUpload.array("file"), async (req, res) => {
     // Store the updated list in the dataset JSON file
     await fs.writeFile(uploadedDatasetPath, JSON.stringify(existingDataset));
 
-    res.json({ message: "Files uploaded successfully" });
+    res.json({ mesnsage: "Files uploaded successfully" });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -278,6 +278,26 @@ app.post('/api/upload-screenshot', async (req, res) => {
     });
 
     res.json({ message: 'Screenshot uploaded successfully', fileName });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.post("/api/search-texture", async (req, res) => {
+  try {
+    const time = myLibrary.textureSearch();
+    res.json({ time });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.post("/api/search-color", async (req, res) => {
+  try {
+    const time = myLibrary.colorSearch();
+    res.json({ time });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });
