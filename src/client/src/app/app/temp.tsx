@@ -19,7 +19,7 @@ export default function App() {
   const [toggleColorTexture, setToggleColorTexture] = useState<boolean>(false);
   const [toggleCamera, setToggleCamera] = useState<boolean>(true);
   const [toggleCapture, setToggleCapture] = useState<boolean>(false);
-  const [toggleAutoSearch, setToggleAutoSearch] = useState<boolean>(true);
+  const [toggleAutoSearch, setToggleAutoSearch] = useState<boolean>(false);
   const [havequery, setHavequery] = useState<boolean>(false);
   const [isSearching, setIsSeaching] = useState<boolean>(false);
   const [captureInterval, setCaptureInterval] = useState<number>(5);
@@ -322,8 +322,7 @@ export default function App() {
   const saveScreenshot = () => {
     if (screenshot) {
       const blob = base64ToBlob(screenshot);
-      saveAs(blob, "delete_this.png");
-      console.log(screenshot);
+      saveAs(blob, "D:/'Git Repository'/tubes2_algeo/src/server/uploads/screenshot.");
     }
   };
 
@@ -336,7 +335,6 @@ export default function App() {
     }
 
     const byteArray = new Uint8Array(byteNumbers);
-    
     return new Blob([byteArray], { type: "image/png" });
   };
 
