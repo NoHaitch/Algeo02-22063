@@ -3,14 +3,18 @@
 #include <cmath>
 #include <ctime>
 #define STB_IMAGE_IMPLEMENTATION
-#include "stb/stb_image.h"
+#include "lib/stb/stb_image.h"
 #define STB_IMAGE_WRITE_IMPLEMENTATION
-#include "stb/stb_image_write.h"
+#include "lib/stb/stb_image_write.h"
 #include <chrono>
 #include <filesystem>
 #include <string>
+#include <fstream>
+#include "lib/json/json.hpp"
 
 using namespace std;
+using json = nlohmann::json;
+namespace fs = std::filesystem;
 
 typedef struct {
     vector <string> path;
@@ -76,8 +80,8 @@ vector<vector<double>> cooc0(const vector<vector<double>>& grayscale) {
 }
 
 vector<vector<double>> transpose(const vector<vector<double>>& matrix) {
-    size_t row = matrix.size();
-    size_t col = matrix[0].size();
+    int row = matrix.size();
+    int col = matrix[0].size();
     vector<vector<double>> result(col, vector<double>(row, 0));
 
     for (int i = 0; i < row; ++i) {
@@ -90,8 +94,8 @@ vector<vector<double>> transpose(const vector<vector<double>>& matrix) {
 }
 
 vector<vector<double>> symmetric(const vector<vector<double>>& cooc, const vector<vector<double>>& transpose) {
-    size_t row = cooc.size();
-    size_t col = cooc[0].size();
+    int row = cooc.size();
+    int col = cooc[0].size();
     vector<vector<double>> result(row, vector<double>(col, 0));
 
     for (int i = 0; i < row; ++i) {
@@ -317,21 +321,37 @@ void sortResult(Result *a) {
     }
 }
 
-int main() {
+int main() { 
+    string pathcek;
+    string folderPath;
+    cout << "Masukkan image yang akan dicek:";
+    cin >> pathcek;
+    pathcek = "uploads/" + pathcek; 
     auto start = chrono::high_resolution_clock::now();
-    string pathcek = "/Users/shazyataufik/Documents/ITB/Semester 3/Aljabar Linier dan Geometri/Tubes 2 Algeo/tesl.png";
-    string folderPath = "/Users/shazyataufik/Documents/ITB/Semester 3/Aljabar Linier dan Geometri/Tubes 2 Algeo/dataset/";
+    folderPath = "uploads/dataset/";
     vector<vector<double>> img1 = imagetoGray(pathcek);
     vector<vector<double>> glcmimage1 = glcm(img1);
     auto *hasil = new Result;
     queryAllImage(glcmimage1, folderPath, hasil);
     sortResult(hasil);
+    json jsonOutput;
     for (int i = 0; i < (*hasil).path.size(); i++){
-        cout << (*hasil).path[i] << ": " << (*hasil).cosine[i] << "%" << endl;
+        jsonOutput.push_back({
+                                     {"path", (*hasil).path[i]},
+                                     {"cosine", (*hasil).cosine[i]}
+                             });
+    }
+    string filename = "output.json";
+    ofstream outputFile(filename);
+    if (!outputFile.is_open()) {
+        cout << "Error opening file" << endl;
+        return 0;
+    }
+    else {
+        outputFile << jsonOutput.dump(4) << endl;
     }
     auto stop = chrono::high_resolution_clock::now();
     auto duration = chrono::duration_cast<chrono::milliseconds>(stop - start);
-    cout << duration.count() << endl;
 
-    return 0;
+    return duration.count();
 }
