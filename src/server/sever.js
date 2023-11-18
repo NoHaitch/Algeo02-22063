@@ -4,7 +4,6 @@ const cors = require("cors");
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs/promises");
-const addon = require("./build/Release/addon");
 
 const app = express();
 const PORT = 8080;
@@ -295,6 +294,8 @@ app.post("/api/upload-screenshot", async (req, res) => {
 });
 
 let isTextureSearchInProgress = false;
+let isColorSearchInProgress = false;
+
 
 app.post("/api/search-texture", async (req, res) => {
   // If the texture search is already in progress, return a response
@@ -337,11 +338,41 @@ app.post("/api/search-texture", async (req, res) => {
 });
 
 app.post("/api/search-color", async (req, res) => {
+  // If the color search is already in progress, return a response
+  if (isColorSearchInProgress) {
+    return res.status(400).json({ error: "Texture search is already in progress" });
+  }
+
   try {
-    const time = myLibrary.colorSearch();
-    res.json({ time });
+    const childProcess = exec(compiledProgramColor, (error, stdout, stderr) => {
+      if (error) {
+        console.error(`Error: ${error.message}`);
+        // Handle error if needed
+      }
+      if (stderr) {
+        console.error(`stderr: ${stderr}`);
+        // Handle stderr if needed
+      }
+
+      // Reset the flag after the texture search is complete
+      isColorSearchInProgress = false;
+
+      // Notify the client about the completion
+      res.json({});
+    });
+
+    // Handle the child process events (e.g., close, exit)
+    childProcess.on('close', (code) => {
+      console.log(`Child process exited with code ${code}`);
+    });
+
+    childProcess.on('exit', (code) => {
+      console.log(`Child process exited with code ${code}`);
+    });
   } catch (error) {
     console.error(error);
+    // Reset the flag in case of an error
+    isColorSearchInProgress = false;
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
