@@ -39,6 +39,7 @@ vector<vector<double>> imagetoGray(const string& path) {
     int width, height, channels;
     unsigned char *image = stbi_load(path.c_str(), &width, &height, &channels, 0);
     if (!image) {
+        cerr << path << endl;
         cerr << "Error loading image" << endl;
         return vector<vector<double>>();
     }
@@ -320,19 +321,17 @@ void sortResult(Result *a) {
     }
 }
 
-#include <node.h>
-using namespace v8;
-
-int textureSearch(string fileName) { 
-    // string fileName;
-    string folderPath;
-    auto start = chrono::high_resolution_clock::now();
-    folderPath = "uploads/dataset/";
-//    cout << folderPath + fileName;
-    vector<vector<double>> img1 = imagetoGray(folderPath + fileName);
+int main() { 
+    cout << "running" << endl;
+    string fileName = "10.jpg";
+    // currently hardcoded
+    string imgPath = "D:/Git_Repository/tubes2_algeo/src/server/uploads/" + fileName;
+    string datasetPath = "uploads/dataset/";
+//    cout << datasetPath + fileName;
+    vector<vector<double>> img1 = imagetoGray(imgPath);
     vector<vector<double>> glcmimage1 = glcm(img1);
     auto *hasil = new Result;
-    queryAllImage(glcmimage1, folderPath, hasil);
+    queryAllImage(glcmimage1, datasetPath, hasil);
     sortResult(hasil);
     json jsonOutput;
     for (int i = 0; i < (*hasil).path.size(); i++){
@@ -341,33 +340,14 @@ int textureSearch(string fileName) {
                                      {"cosine", (*hasil).cosine[i]}
                              });
     }
-    string filename = "output.json";
-    ofstream outputFile(filename);
+    string resultPath = "query.json";
+    ofstream outputFile(resultPath);
     if (!outputFile.is_open()) {
         return -1;
     }
     else {
         outputFile << jsonOutput.dump(4) << endl;
     }
-    auto stop = chrono::high_resolution_clock::now();
-    auto duration = chrono::duration_cast<chrono::milliseconds>(stop - start);
-
-    return duration.count();
+    // cout << "finished" << endl;
+    return 0;
 }
-
-
-void Initialize(Local<Object> exports) {
-  NODE_SET_METHOD(exports, "textureSearch", [](const FunctionCallbackInfo<Value>& args) {
-    Isolate* isolate = args.GetIsolate();
-    const char* input = "example"; // Replace with actual input
-    int result = textureSearch(input);
-    args.GetReturnValue().Set(Number::New(isolate, result));
-  });
-}
-
-NODE_MODULE(NODE_GYP_MODULE_NAME, Initialize)
-
-
-// int main(){
-//     cout << textureSearch("uploads/7.jpg");
-// }

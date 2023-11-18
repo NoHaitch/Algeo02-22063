@@ -6,12 +6,15 @@ const path = require("path");
 const fs = require("fs/promises");
 const addon = require("./build/Release/addon");
 
-
 const app = express();
 const PORT = 8080;
 const DATA_FILE_PATH1 = path.join(__dirname, "uploads", "image.json");
 const DATA_FILE_PATH2 = path.join(__dirname, "uploads", "tempdataset.json");
 const DATASET_PATH = path.join(__dirname, "uploads", "dataset");
+
+const { exec } = require('child_process');
+const compiledProgramTexture = 'textureSearch.exe';
+const compiledProgramColor = 'colorSearch.exe';
 
 app.listen(PORT, () => {
   console.log(`Server started on port ${PORT}`);
@@ -97,11 +100,15 @@ app.post("/api/upload-img", ImgUpload.array("file"), async (req, res) => {
         ? JSON.parse(existingImagesData)
         : [];
 
+      // Check if the last uploaded image is the same as the current one
+      if (existingImages.length > 0 && existingImages[0] === lastUploadedFileName) {
+        return res.json({ message: "File is the same as the last uploaded image" });
+      }
+
       // Delete the image before the newly uploaded image
       if (existingImages.length > 0) {
-        const imageToDelete = existingImages[0]; // Change this line
+        const imageToDelete = existingImages[0]; 
         await fs.unlink(path.join(__dirname, "uploads", imageToDelete));
-        // DELETE THE IMAGE
       }
 
       // Insert the current image at the beginning of the list
@@ -224,7 +231,8 @@ app.post("/api/refresh-dataset", async (req, res) => {
   }
 });
 
-app.delete("/api/reset-temp", async (req, res) => {
+app.post("/api/reset-temp", async (req, res) => {
+  // this has not been fixed
   const tempdatasetPath = path.join(__dirname, "uploads", "tempdataset");
   try {
     await fs.access(tempdatasetPath);
@@ -283,17 +291,47 @@ app.post("/api/upload-screenshot", async (req, res) => {
   }
 });
 
+let isTextureSearchInProgress = false;
+
 app.post("/api/search-texture", async (req, res) => {
-  const fileName = DATA_FILE_PATH1;
-  console.log(fileName);
+  // If the texture search is already in progress, return a response
+  if (isTextureSearchInProgress) {
+    return res.status(400).json({ error: "Texture search is already in progress" });
+  }
+
   try {
-    const time = await runTextureSearchTest('uploads/' + fileName);
-    res.json({ time });
+    const childProcess = exec(compiledProgramTexture, (error, stdout, stderr) => {
+      if (error) {
+        console.error(`Error: ${error.message}`);
+        // Handle error if needed
+      }
+      if (stderr) {
+        console.error(`stderr: ${stderr}`);
+        // Handle stderr if needed
+      }
+
+      // Reset the flag after the texture search is complete
+      isTextureSearchInProgress = false;
+
+      // Notify the client about the completion
+      res.json({});
+    });
+
+    // Handle the child process events (e.g., close, exit)
+    childProcess.on('close', (code) => {
+      console.log(`Child process exited with code ${code}`);
+    });
+
+    childProcess.on('exit', (code) => {
+      console.log(`Child process exited with code ${code}`);
+    });
   } catch (error) {
     console.error(error);
+    // Reset the flag in case of an error
+    isTextureSearchInProgress = false;
     res.status(500).json({ error: "Internal Server Error" });
   }
-})
+});
 
 app.post("/api/search-color", async (req, res) => {
   try {
@@ -304,20 +342,3 @@ app.post("/api/search-color", async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
-
-function runTextureSearchTest(path) {
-  const imagePath = path; // Replace with the actual image path
-  try {
-    // Check if the dataset folder exists, and create it if it doesn't
-    fs.access(imagePath);
-    new Error("Invalid file type. Only images are allowed.")    
-  } catch (error) {
-    new Error("Invalid file type. Only images are allowed.")    
-  }
-
-  // Call the textureSearch function
-  const result = addon.textureSearch(imagePath);
-
-  console.log(`Texture search for ${imagePath}`);
-  console.log(`Time taken: ${result} milliseconds`);
-}

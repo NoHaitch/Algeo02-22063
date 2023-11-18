@@ -1,6 +1,6 @@
 import ImgItems from "./ImgItems";
 import DatasetNoquery from "../../../server/uploads/dataset.json";
-import DatasetQuery from "../../../server/uploads/query.json";
+import DatasetQuery from "../../../server/query.json";
 import { useState, useRef } from "react";
 
 export default function GetAllImgItems({ query }: { query: boolean }) {

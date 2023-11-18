@@ -32,6 +32,7 @@ export default function App() {
     selectedDataset: "",
     image: "",
     dataset: "",
+    timeSearch: -1,
   });
 
   const [isUploading, setIsUploading] = useState(false);
@@ -89,7 +90,7 @@ export default function App() {
     const files = datasetInput?.files;
     const startTime = new Date();
     setIsUploading(true);
-
+    
     if (!files || files.length === 0) {
       createDangerAlert("Please select a folder");
       setIsUploading(false);
@@ -167,7 +168,7 @@ export default function App() {
       createDangerAlert("No image to query. Please insert an image.");
     } else {
       setIsSeaching(true);
-      //setHavequery(true);
+      setHavequery(true);
       if (toggleColorTexture) {
         // Color search
         console.log("color search");
@@ -175,13 +176,14 @@ export default function App() {
       } else {
         // Texture search
         console.log("texture search");
-        const time = await handleTextureSearch();
+        await handleTextureSearch();
       }
       setIsSeaching(false);
     }
   };
 
   const handleTextureSearch = async () => {
+    const startTime = performance.now();
     try {
       const fileImgName = ImgQuery[0];
       const time = await fetch("http://127.0.0.1:8080/api/search-texture", {
@@ -198,7 +200,16 @@ export default function App() {
         `Texture search for file ${fileImgName} took ${time} milliseconds`
       );
     } catch (error) {
-      console.error("Error in texture search:", error);
+      console.error("Error during texture search:", error);
+    } finally {
+      const endTime = performance.now();
+  
+      const elapsedTime = endTime - startTime;
+      const elapsedTimeInSeconds = Math.round(elapsedTime / 10) / 100;
+      setData((prevData) => ({
+        ...prevData,
+        timeSearch: elapsedTimeInSeconds,
+      }));
     }
   };
 
@@ -370,7 +381,7 @@ export default function App() {
           initial={{ opacity: 0, y: -200 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
-          className="flex flex-col justify-center items-center font-bold space-y-5 -mt-4 m-5 p-8"
+          className="flex flex-col justify-center items-center font-bold space-y-5 -mt-4 m-5 p-2"
         >
           <div className="title flex flex-row select-none">
             <Image
@@ -526,9 +537,8 @@ export default function App() {
                     ref={currentImgShownRef}
                     src="/placeholder.jpg"
                     height={400}
-                    width={400}
                     alt="Picture of the author"
-                    className="rounded-[25px] drop-shadow-[4px_4px_2.5px_#000] border-2 border-[--trinary] bg-gray-300"
+                    className=" max-h-[400px] w-auto max-w-[400px] rounded-[25px] drop-shadow-[4px_4px_2.5px_#000] border-2 border-[--trinary] bg-gray-300"
                   />
                   <label ref={currentImgLabelRef}>file.jpg</label>
                 </div>
@@ -677,7 +687,7 @@ export default function App() {
             </div>
           )}
           {imgCount > 0 && (
-            <div className="font-bold text-[--trinary] p-5 text-center">
+            <div className="font-bold text-[--trinary] text-center">
               <h2>
                 Dataset :{" "}
                 {currentData.dataset != "" ? currentData.dataset : "default"}
@@ -688,7 +698,7 @@ export default function App() {
         <div className="w-full text-right">
           {searchTime != null ? `${searchTime} ms` : ""}
         </div>
-        <span className="m-4 h-0.5 w-full bg-[--secondary]"></span>
+        <span className="m-4 h-0.5 w-full bg-[--secondary] divider"></span>
         <div
           id="success-alert"
           className="absolute z-[10] top-0 mt-5 flex items-center p-4 mb-4 rounded-lg bg-gray-800 text-green-400 drop-shadow-2xl"
@@ -776,6 +786,7 @@ export default function App() {
           </button>
         </div>
       </main>
+      {!isUploading && !isSearching && havequery ? (<h1 className="font-bold text-[--trinary] text-right">Search Time: {currentData.timeSearch} seconds</h1>) : ""}
       {!isUploading &&
         (!isSearching ? (
           <GetAllImgItems query={havequery} />
