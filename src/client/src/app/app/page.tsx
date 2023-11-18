@@ -25,7 +25,6 @@ export default function App() {
   const [havequery, setHavequery] = useState<boolean>(false);
   const [isSearching, setIsSeaching] = useState<boolean>(false);
   const [captureInterval, setCaptureInterval] = useState<number>(5);
-  const [searchTime, setSearchTime] = useState<number | null>(null);
   const [screenshot, setScreenshot] = useState<string | null>(null);
   const [webcamError, setWebcamError] = useState<boolean>(false);
   const [currentData, setData] = useState({
@@ -90,7 +89,7 @@ export default function App() {
     const files = datasetInput?.files;
     const startTime = new Date();
     setIsUploading(true);
-    
+
     if (!files || files.length === 0) {
       createDangerAlert("Please select a folder");
       setIsUploading(false);
@@ -178,7 +177,6 @@ export default function App() {
         console.log("texture search");
         handleTextureSearch();
       }
-      setIsSeaching(false);
     }
   };
 
@@ -193,14 +191,11 @@ export default function App() {
         },
         body: JSON.stringify({}),
       }).then((response) => response.json());
-      console.log(
-        `Texture search for file ${fileImgName} took ${time} milliseconds`
-      );
     } catch (error) {
-      console.error("Error during texture search:", error);
+      createDangerAlert("Texture Search Failed");
     } finally {
       const endTime = performance.now();
-  
+
       const elapsedTime = endTime - startTime;
       const elapsedTimeInSeconds = Math.round(elapsedTime / 10) / 100;
       setData((prevData) => ({
@@ -208,6 +203,7 @@ export default function App() {
         timeSearch: elapsedTimeInSeconds,
       }));
     }
+    setIsSeaching(false);
   };
 
   const handleColorSearch = async () => {
@@ -221,14 +217,11 @@ export default function App() {
         },
         body: JSON.stringify({}),
       }).then((response) => response.json());
-      console.log(
-        `Texture search for file ${fileImgName} took ${time} milliseconds`
-      );
     } catch (error) {
-      console.error("Error during texture search:", error);
+      createDangerAlert("Color Search Failed");
     } finally {
       const endTime = performance.now();
-  
+
       const elapsedTime = endTime - startTime;
       const elapsedTimeInSeconds = Math.round(elapsedTime / 10) / 100;
       setData((prevData) => ({
@@ -236,6 +229,7 @@ export default function App() {
         timeSearch: elapsedTimeInSeconds,
       }));
     }
+    setIsSeaching(false);
   };
 
   /* SELECTING FILES */
@@ -321,12 +315,17 @@ export default function App() {
 
   useEffect(() => {
     const captureScreenshot = async () => {
-      if (webcamRef.current && toggleCapture) {
+      if (toggleCapture && webcamRef.current) {
         try {
+          // Ensure that the webcam is accessible before attempting to capture
           const base64 = webcamRef.current.getScreenshot();
           setScreenshot(base64);
           setWebcamError(false);
+
+          // Uncomment the line below to save the screenshot as a file
+          // saveScreenshot(base64);
         } catch (error) {
+          // Handle webcam access error
           console.error("Error accessing webcam:", error);
           setWebcamError(true);
         }
@@ -337,7 +336,7 @@ export default function App() {
     captureScreenshot();
 
     // Set up interval to capture a screenshot every 5 seconds
-    const intervalId = setInterval(captureScreenshot, 5000);
+    const intervalId = setInterval(captureScreenshot, captureInterval! * 1000);
 
     // Cleanup interval on component unmount
     return () => clearInterval(intervalId);
@@ -566,20 +565,22 @@ export default function App() {
             </div>
           ) : (
             <div className="flex flex-col items-center text-center">
-              <div className="flex flex-col items-center">
-                <div className="flex flex-row items-center space-x-8 m-5">
-                  <div className="">
-                    <h2 className="text-center">Webcam</h2>
-                    {webcamError ? (
-                      <div className="w-[400px] h-[300px] bg-gray-300"></div>
-                    ) : (
-                      <Webcam
-                        audio={false}
-                        ref={webcamRef}
-                        screenshotFormat="image/png"
-                        className="w-[400px] h-auto rounded-[5px] border-2 border-[--trinary] bg-gray-300 "
-                      />
-                    )}
+              <div className="flex flex-col justify-center items-center font-bold space-y-2">
+                <div className="flex flex-row items-center"> 
+                  <div className="text-center text-slate-600 m-5">
+                    <div className="">
+                      <h2 className="text-center">Webcam</h2>
+                      {webcamError ? (
+                        <div className="w-[400px] h-[300px] bg-gray-300"></div>
+                      ) : (
+                        <Webcam
+                          audio={false}
+                          ref={webcamRef}
+                          screenshotFormat="image/png"
+                          className="w-[400px] h-auto rounded-[5px] border-2 border-[--trinary] bg-gray-300 "
+                        />
+                      )}
+                    </div>
                   </div>
                   {screenshot && !webcamError && (
                     <div>
@@ -592,13 +593,114 @@ export default function App() {
                     </div>
                   )}
                 </div>
+              </div>
+              <div className="flex flex-col items-center">
+                <div className="flex flex-col items-center space-y-4">
+                    <input
+                      type="file"
+                      ref={imgInputRef}
+                      className="hidden"
+                      id="imgInput"
+                      onChange={handleImgInputChange}
+                    />
+                    <input
+                      type="file"
+                      ref={datasetInputRef}
+                      // @ts-ignore
+                      directory=""
+                      webkitdirectory=""
+                      className="hidden"
+                      id="datasetInput"
+                      onChange={handleDatasetInputChange}
+                    />
+                    <div className="flex flex-col items-center space-y-2">
+                      <div className="flex flex-row">
+                        <div className="flex flex-col">
+                          <button
+                            onClick={openDatasetSelect}
+                            className="h-[50px] relative inline-flex items-center justify-center p-4 px-5 py-3 overflow-hidden font-medium text-indigo-600 transition duration-300 ease-out rounded-full shadow-xl group hover:ring-1 hover:ring-purple-500"
+                          >
+                            <span className="absolute inset-0 w-full h-full bg-gradient-to-br from-blue-600 via-purple-600 to-pink-700"></span>
+                            <span className="absolute bottom-0 right-0 block w-64 h-64 mb-32 mr-4 transition duration-500 origin-bottom-left transform rotate-45 translate-x-24 bg-pink-500 rounded-full opacity-30 group-hover:rotate-90 ease"></span>
+                            <span className="relative text-white">
+                              Select DataSet Folder
+                            </span>
+                          </button>
+                          <h1 className="text-center font-normal text-sm">
+                            {currentData.selectedDataset}
+                          </h1>
+                        </div>
+                        <button
+                          onClick={handleDatasetUpload}
+                          className="ml-2 h-[50px] relative inline-flex items-center justify-center p-4 px-5 py-3 overflow-hidden font-medium text-indigo-600 transition duration-300 ease-out rounded-full shadow-xl group hover:ring-1 hover:ring-purple-500"
+                        >
+                          <span className="absolute inset-0 w-full h-full bg-gradient-to-br from-blue-600 via-purple-600 to-pink-700"></span>
+                          <span className="absolute bottom-0 right-0 block w-64 h-64 mb-32 mr-4 transition duration-500 origin-bottom-left transform rotate-45 translate-x-24 bg-pink-500 rounded-full opacity-30 group-hover:rotate-90 ease"></span>
+                          <span className="relative text-white">Upload</span>
+                          <svg
+                            className="ml-2 w-5 h-5 z-[10]"
+                            fill="none"
+                            stroke="white"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M14 5l7 7m0 0l-7 7m7-7H3"
+                            ></path>
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                    <div className="-mr-5 text-l font-bold flex flex-row space-x-3 mt-5">
+                      <h3
+                        className={`${
+                          toggleColorTexture ? "text-[--primary]" : ""
+                        }`}
+                      >
+                        Color
+                      </h3>
+
+                      <div
+                        onClick={() =>
+                          setToggleColorTexture(!toggleColorTexture)
+                        }
+                        className={`flex h-7 w-14 cursor-pointer rounded-full border-2  border-[--primary] ${
+                          toggleColorTexture
+                            ? "justify-start bg-white"
+                            : "justify-end bg-[--primary]"
+                        } p-[2px] `}
+                      >
+                        <motion.div
+                          className={`h-5 w-5 rounded-full ${
+                            toggleColorTexture ? "bg-[--primary]" : "bg-white"
+                          }`}
+                          layout
+                          transition={{
+                            type: "spring",
+                            stiffness: 700,
+                            damping: 30,
+                          }}
+                        />
+                      </div>
+                      <h3
+                        className={`${
+                          !toggleColorTexture ? "text-[--primary]" : ""
+                        }`}
+                      >
+                        Texture
+                      </h3>
+                    </div>
+                  </div>
                 <div className="flex flex-col items-center">
                   <div className="flex flex-row m-2 text-center justify-center items-center">
                     <h1>Capture Interval</h1>
                     <input
                       type="number"
-                      step="0.1"
-                      min="2"
+                      step="0.2"
+                      min="4"
                       max="20"
                       disabled={toggleCapture}
                       value={captureInterval}
@@ -610,7 +712,7 @@ export default function App() {
                         setCaptureInterval(
                           !isNaN(newInterval) && newInterval >= 0
                             ? newInterval
-                            : 0.1
+                            : 0.2
                         );
                       }}
                       // Add this onBlur event to prevent issues with decimal input
@@ -619,7 +721,7 @@ export default function App() {
                         setCaptureInterval(
                           !isNaN(newInterval) && newInterval >= 0
                             ? newInterval
-                            : 0.1
+                            : 0.2
                         );
                       }}
                     />
@@ -705,9 +807,6 @@ export default function App() {
             </div>
           )}
         </motion.div>
-        <div className="w-full text-right">
-          {searchTime != null ? `${searchTime} ms` : ""}
-        </div>
         <span className="m-4 h-0.5 w-full bg-[--secondary] divider"></span>
         <div
           id="success-alert"
@@ -796,7 +895,13 @@ export default function App() {
           </button>
         </div>
       </main>
-      {!isUploading && !isSearching && havequery ? (<h1 className="font-bold text-[--trinary] text-right">Search Time: {currentData.timeSearch} seconds</h1>) : ""}
+      {!isUploading && !isSearching && havequery ? (
+        <h1 className="font-bold text-[--trinary] text-right">
+          Search Time: {currentData.timeSearch} seconds
+        </h1>
+      ) : (
+        ""
+      )}
       {!isUploading &&
         (!isSearching ? (
           <GetAllImgItems query={havequery} />
