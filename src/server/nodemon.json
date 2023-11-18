@@ -1,3 +1,3 @@
 {
-    "ignore": ["node_modules", "logs", "*.log", "uploads", "output.json", "query.json"]
+    "ignore": ["node_modules", "logs", "*.log", "uploads", "cache.json", "query.json"]
 }
