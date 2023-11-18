@@ -215,12 +215,12 @@ int getNumberofFiles(const string& path) {
 
 void queryDatasetIntoJSON(const string& path, int heightImageInserted, int widthImageInserted) {
     int i = 0;
-    cout << "Entering query..." << endl;
+    // cout << "Entering query..." << endl;
     int num = getNumberofFiles(path);
     for (const auto& entry : fs::directory_iterator(path)) {
-        ofstream o("output.json", ios_base::app);
+        ofstream o("cache.json", ios_base::app);
         if (!o.is_open()) {
-            cout << "Error opening file" << endl;
+            // cout << "Error opening file" << endl;
             return;
         }
         vector<vector<HSV>> imageHSV = convertQueryImagetoHSV(path + entry.path().filename().string(), heightImageInserted, widthImageInserted);
@@ -307,9 +307,9 @@ void calculateResult(const string &pathQuery, const string &pathJSON, vector<vec
         return;
     }
     json data;
-    cout << "Querying.." << endl;
+    // cout << "Querying.." << endl;
     file >> data;
-    cout << "Begin" << endl;
+    // cout << "Begin" << endl;
     for (const auto &entry : fs::directory_iterator(pathQuery)) {
         float cosine = cosImage(data[i], histogramOri);
         if (cosine > 60) {
@@ -334,7 +334,7 @@ void saveResulttoJSON(vector <Result> &result, const string& filename) {
 
     ofstream outputFile(filename);
     if (!outputFile.is_open()) {
-        cout << "Error opening file" << endl;
+        // cout << "Error opening file" << endl;
         return;
     }
     else {
@@ -381,26 +381,28 @@ void sortResult(vector<Result>& a) {
 }
 
 
-long long searchColor(const string& pathImageInserted, const string& pathDataset) {
-    auto start = chrono::high_resolution_clock::now();
+void searchColor(const string& pathImageInserted, const string& pathDataset) {
     int height, width, channel;
     stbi_info(pathImageInserted.c_str(), &height, &width, &channel);
-    if (!fs::exists("output.json")) {
+    if (!fs::exists("cache.json")) {
         queryDatasetIntoJSON(pathDataset, height, width);
     }
     auto *histogramOri = new vector <vector<int>>;
     *histogramOri = countHistogramOriginal(convertOriginalImagetoHSV(pathImageInserted), 4);
     auto *result = new vector <Result>;
-    cout << "Started.." << endl;
-    calculateResult(pathDataset, "output.json", *histogramOri, result);
+    // cout << "Started.." << endl;
+    calculateResult(pathDataset, "cache.json", *histogramOri, result);
     sortResult(*result);
     saveResulttoJSON(*result, "query.json");
-    auto end = chrono::high_resolution_clock::now();
-    return chrono::duration_cast<chrono::milliseconds>(end - start).count();
 }
 
-
-int main() {
-    cout << searchColor("uploads/dataset/4.jpg", "uploads/dataset/");
+int main() { 
+    //cout << "running" << endl;
+    string fileName = "query.jpg";
+    // CHANGE THIS PATH
+    string imgPath = "D:/Git_Repository/tubes2_algeo/src/server/uploads/" + fileName;
+    string datasetPath = "uploads/dataset/";
+    searchColor(imgPath,datasetPath);
+    //cout << "finished" << endl;
     return 0;
 }
