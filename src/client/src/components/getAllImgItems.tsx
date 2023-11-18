@@ -1,10 +1,14 @@
 import ImgItems from "./ImgItems";
 import DatasetNoquery from "../../../server/uploads/dataset.json";
+import DatasetQuery from "../../../server/query.json";
 import { useState, useRef } from "react";
 
 export default function GetAllImgItems({ query }: { query: boolean }) {
   const itemsPerPage = 8;
-  const imgCount = DatasetNoquery.length;
+  var imgCount = DatasetNoquery.length;
+  if(query){
+    imgCount = DatasetQuery.length;
+  }
   const pageCount = Math.ceil(imgCount / itemsPerPage);
 
   const [currentPage, setCurrentPage] = useState(1);

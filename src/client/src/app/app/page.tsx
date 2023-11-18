@@ -5,8 +5,9 @@ import { useEffect, useRef, useState } from "react";
 import Webcam from "react-webcam";
 import { motion } from "framer-motion";
 import GetAllImgItems from "@/components/getAllImgItems";
-import DatasetNoquery from "../../../../server/uploads/dataset.json";
 import { saveAs } from "file-saver";
+import DatasetNoquery from "../../../../server/uploads/dataset.json";
+import ImgQuery from "../../../../server/uploads/image.json";
 
 export default function App() {
   const imgCount = DatasetNoquery.length;
@@ -15,6 +16,7 @@ export default function App() {
   const datasetInputRef = useRef<HTMLInputElement>(null);
   const currentImgShownRef = useRef<HTMLImageElement>(null);
   const currentImgLabelRef = useRef<HTMLLabelElement>(null);
+  const webcamRef = useRef<Webcam>(null);
 
   const [toggleColorTexture, setToggleColorTexture] = useState<boolean>(false);
   const [toggleCamera, setToggleCamera] = useState<boolean>(true);
@@ -24,11 +26,13 @@ export default function App() {
   const [isSearching, setIsSeaching] = useState<boolean>(false);
   const [captureInterval, setCaptureInterval] = useState<number>(5);
   const [searchTime, setSearchTime] = useState<number | null>(null);
-
+  const [screenshot, setScreenshot] = useState<string | null>(null);
+  const [webcamError, setWebcamError] = useState<boolean>(false);
   const [currentData, setData] = useState({
     selectedDataset: "",
     image: "",
     dataset: "",
+    timeSearch: -1,
   });
 
   const [isUploading, setIsUploading] = useState(false);
@@ -38,7 +42,6 @@ export default function App() {
     const imgInput = imgInputRef.current;
     const currentImgShown = currentImgShownRef.current;
     const currentImgLabel = currentImgLabelRef.current;
-    const webcamRef = useRef<Webcam>(null);
     const file = imgInput?.files?.[0];
 
     if (!file) {
@@ -87,7 +90,7 @@ export default function App() {
     const files = datasetInput?.files;
     const startTime = new Date();
     setIsUploading(true);
-
+    
     if (!files || files.length === 0) {
       createDangerAlert("Please select a folder");
       setIsUploading(false);
@@ -159,7 +162,7 @@ export default function App() {
   };
 
   const handleSearchImage = async () => {
-    if (currentData.dataset == "") {
+    if (imgCount == 0) {
       createDangerAlert("Dataset is empty. Please upload a dataset");
     } else if (currentData.image == "") {
       createDangerAlert("No image to query. Please insert an image.");
@@ -173,24 +176,40 @@ export default function App() {
       } else {
         // Texture search
         console.log("texture search");
-        handleTextureSearch();
+        await handleTextureSearch();
       }
       setIsSeaching(false);
     }
   };
 
   const handleTextureSearch = async () => {
+    const startTime = performance.now();
     try {
-      const response = await fetch("/api/search-texture", {
+      const fileImgName = ImgQuery[0];
+      const time = await fetch("http://127.0.0.1:8080/api/search-texture", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-      });
-      const data = await response.json();
-      setSearchTime(data.time);
+        body: JSON.stringify({}),
+      }).then((response) => response.json());
+
+      console.log(`Texture search for file ${fileImgName} response:`, { time });
+
+      console.log(
+        `Texture search for file ${fileImgName} took ${time} milliseconds`
+      );
     } catch (error) {
-      console.error(error);
+      console.error("Error during texture search:", error);
+    } finally {
+      const endTime = performance.now();
+  
+      const elapsedTime = endTime - startTime;
+      const elapsedTimeInSeconds = Math.round(elapsedTime / 10) / 100;
+      setData((prevData) => ({
+        ...prevData,
+        timeSearch: elapsedTimeInSeconds,
+      }));
     }
   };
 
@@ -288,12 +307,7 @@ export default function App() {
   const handleCameraSearch = async () => {
     setToggleCapture(false);
     saveScreenshot();
-
   };
-
-  const webcamRef = useRef<Webcam>(null);
-  const [screenshot, setScreenshot] = useState<string | null>(null);
-  const [webcamError, setWebcamError] = useState<boolean>(false);
 
   useEffect(() => {
     const captureScreenshot = async () => {
@@ -336,7 +350,7 @@ export default function App() {
     }
 
     const byteArray = new Uint8Array(byteNumbers);
-    
+
     return new Blob([byteArray], { type: "image/png" });
   };
 
@@ -367,7 +381,7 @@ export default function App() {
           initial={{ opacity: 0, y: -200 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
-          className="flex flex-col justify-center items-center font-bold space-y-5 -mt-4 m-5 p-8"
+          className="flex flex-col justify-center items-center font-bold space-y-5 -mt-4 m-5 p-2"
         >
           <div className="title flex flex-row select-none">
             <Image
@@ -523,9 +537,8 @@ export default function App() {
                     ref={currentImgShownRef}
                     src="/placeholder.jpg"
                     height={400}
-                    width={400}
                     alt="Picture of the author"
-                    className="rounded-[25px] drop-shadow-[4px_4px_2.5px_#000] border-2 border-[--trinary] bg-gray-300"
+                    className=" max-h-[400px] w-auto max-w-[400px] rounded-[25px] drop-shadow-[4px_4px_2.5px_#000] border-2 border-[--trinary] bg-gray-300"
                   />
                   <label ref={currentImgLabelRef}>file.jpg</label>
                 </div>
@@ -673,16 +686,19 @@ export default function App() {
               </div>
             </div>
           )}
-          {currentData.dataset != "" && (
-            <div className="font-bold text-[--trinary] p-5 text-center">
-              <h2>Dataset : {currentData.dataset}</h2>
+          {imgCount > 0 && (
+            <div className="font-bold text-[--trinary] text-center">
+              <h2>
+                Dataset :{" "}
+                {currentData.dataset != "" ? currentData.dataset : "default"}
+              </h2>
             </div>
           )}
         </motion.div>
         <div className="w-full text-right">
           {searchTime != null ? `${searchTime} ms` : ""}
         </div>
-        <span className="m-4 h-0.5 w-full bg-[--secondary]"></span>
+        <span className="m-4 h-0.5 w-full bg-[--secondary] divider"></span>
         <div
           id="success-alert"
           className="absolute z-[10] top-0 mt-5 flex items-center p-4 mb-4 rounded-lg bg-gray-800 text-green-400 drop-shadow-2xl"
@@ -770,6 +786,7 @@ export default function App() {
           </button>
         </div>
       </main>
+      {!isUploading && !isSearching && havequery ? (<h1 className="font-bold text-[--trinary] text-right">Search Time: {currentData.timeSearch} seconds</h1>) : ""}
       {!isUploading &&
         (!isSearching ? (
           <GetAllImgItems query={havequery} />

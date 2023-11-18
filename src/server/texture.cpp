@@ -38,8 +38,8 @@ vector<vector<double>> grayscale(const vector<vector<vector<int>>>& img) {
 vector<vector<double>> imagetoGray(const string& path) {
     int width, height, channels;
     unsigned char *image = stbi_load(path.c_str(), &width, &height, &channels, 0);
-
     if (!image) {
+        cerr << path << endl;
         cerr << "Error loading image" << endl;
         return vector<vector<double>>();
     }
@@ -272,11 +272,11 @@ void queryAllImage(vector<vector<double>> glcmimage1, const string& path, Result
     for (auto& p : filesystem::directory_iterator(path)) {
         auto *matQuery = new vector<vector<double>>;
         auto *matQueryGLCM = new vector<vector<double>>;
-        *matQuery = imagetoGray(p.path());
+        *matQuery = imagetoGray(path + p.path().filename().string());
         *matQueryGLCM = glcm(*matQuery);
         float cos = cosine(glcmimage1, *matQueryGLCM);
         if (cos >= 60) {
-            ((*hasil).path).push_back(p.path().filename());
+            ((*hasil).path).push_back(p.path().filename().string());
             ((*hasil).cosine).push_back(cos);
         }
         free(matQuery);
@@ -322,17 +322,16 @@ void sortResult(Result *a) {
 }
 
 int main() { 
-    string pathcek;
-    string folderPath;
-    cout << "Masukkan image yang akan dicek:";
-    cin >> pathcek;
-    pathcek = "uploads/" + pathcek; 
-    auto start = chrono::high_resolution_clock::now();
-    folderPath = "uploads/dataset/";
-    vector<vector<double>> img1 = imagetoGray(pathcek);
+    cout << "running" << endl;
+    string fileName = "query.jpg";
+    // CHANGE THIS PATH
+    string imgPath = "D:/Git_Repository/tubes2_algeo/src/server/uploads/" + fileName;
+    string datasetPath = "uploads/dataset/";
+//    cout << datasetPath + fileName;
+    vector<vector<double>> img1 = imagetoGray(imgPath);
     vector<vector<double>> glcmimage1 = glcm(img1);
     auto *hasil = new Result;
-    queryAllImage(glcmimage1, folderPath, hasil);
+    queryAllImage(glcmimage1, datasetPath, hasil);
     sortResult(hasil);
     json jsonOutput;
     for (int i = 0; i < (*hasil).path.size(); i++){
@@ -341,17 +340,14 @@ int main() {
                                      {"cosine", (*hasil).cosine[i]}
                              });
     }
-    string filename = "output.json";
-    ofstream outputFile(filename);
+    string resultPath = "query.json";
+    ofstream outputFile(resultPath);
     if (!outputFile.is_open()) {
-        cout << "Error opening file" << endl;
-        return 0;
+        return -1;
     }
     else {
         outputFile << jsonOutput.dump(4) << endl;
     }
-    auto stop = chrono::high_resolution_clock::now();
-    auto duration = chrono::duration_cast<chrono::milliseconds>(stop - start);
-
-    return duration.count();
+    // cout << "finished" << endl;
+    return 0;
 }
