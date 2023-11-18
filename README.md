@@ -99,7 +99,7 @@ Phoenix Image a Content-Based Image Retrieval System made by Bjir Anak Nopal. Th
 ### Back-End
 - [Express v4.18.2](https://expressjs.com/) 
 - [Cors v2.8.5](https://www.npmjs.com/package/cors)
-- [Multer v1.4.5-lts.1](https://www.npmjs.com/package/multer)\
+- [Multer v1.4.5-lts.1](https://www.npmjs.com/package/multer)
 - 
 
 ### C++ library
