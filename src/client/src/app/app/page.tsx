@@ -176,7 +176,7 @@ export default function App() {
       } else {
         // Texture search
         console.log("texture search");
-        await handleTextureSearch();
+        handleTextureSearch();
       }
       setIsSeaching(false);
     }
@@ -193,9 +193,6 @@ export default function App() {
         },
         body: JSON.stringify({}),
       }).then((response) => response.json());
-
-      console.log(`Texture search for file ${fileImgName} response:`, { time });
-
       console.log(
         `Texture search for file ${fileImgName} took ${time} milliseconds`
       );
@@ -214,17 +211,30 @@ export default function App() {
   };
 
   const handleColorSearch = async () => {
+    const startTime = performance.now();
     try {
-      const response = await fetch("/api/search-color", {
+      const fileImgName = ImgQuery[0];
+      const time = await fetch("http://127.0.0.1:8080/api/search-color", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-      });
-      const data = await response.json();
-      data(data.time);
+        body: JSON.stringify({}),
+      }).then((response) => response.json());
+      console.log(
+        `Texture search for file ${fileImgName} took ${time} milliseconds`
+      );
     } catch (error) {
-      console.error(error);
+      console.error("Error during texture search:", error);
+    } finally {
+      const endTime = performance.now();
+  
+      const elapsedTime = endTime - startTime;
+      const elapsedTimeInSeconds = Math.round(elapsedTime / 10) / 100;
+      setData((prevData) => ({
+        ...prevData,
+        timeSearch: elapsedTimeInSeconds,
+      }));
     }
   };
 
