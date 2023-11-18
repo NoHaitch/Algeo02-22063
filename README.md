@@ -60,7 +60,6 @@
     <li><a href="#setup">Setup</a></li>
     <li><a href="#usage">Usage</a></li>
     <li><a href="#project-status">Project Status</a></li>
-    <li><a href="#room-for-improvement">Room For Improvement</a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#special-thanks">Special Thanks</a></li>
     <li><a href="#license">License</a></li>
@@ -100,7 +99,8 @@ Phoenix Image a Content-Based Image Retrieval System made by Bjir Anak Nopal. Th
 ### Back-End
 - [Express v4.18.2](https://expressjs.com/) 
 - [Cors v2.8.5](https://www.npmjs.com/package/cors)
-- [Multer v1.4.5-lts.1](https://www.npmjs.com/package/multer)
+- [Multer v1.4.5-lts.1](https://www.npmjs.com/package/multer)\
+- 
 
 ### C++ library
 - [json](https://github.com/nlohmann/json)
@@ -127,8 +127,14 @@ Phoenix Image a Content-Based Image Retrieval System made by Bjir Anak Nopal. Th
 
 <!-- SCREEENSHOTS -->
 ## Screenshots
-![Example screenshot](./img/screenshot.png)
-<!-- If you have screenshots you'd like to share, include them here. -->
+<div align="center">
+<img src="./img/landing-page.png"  width="440" alt="Landing Page">
+<img src="./img/fresh-app.png" width="440"  alt="Fresh Main App">
+<img src="./img/app-example.png" width="440"  alt="App Example">
+<img src="./img/query-result.png" width="440"  alt="Query Result">
+<img src="./img/webcamera.png" width="440"   alt="Webcamera">
+</div>
+
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -144,7 +150,16 @@ git clone https://github.com/NoHaitch/Algeo02-22063
 ```bash
 npm install
 ``` 
-### 3. Run the program    
+### 3. Change the absolute Path  
+&nbsp; &nbsp; In `src/server/texture.cpp` and `src/server/color.cpp`  
+&nbsp; &nbsp; At main(), change the path to the uploads directory
+
+### 4. Build the C++ server component (Require g++)
+```bash
+npm run build-server
+``` 
+
+### 5. Run the program    
 ```bash
 npm run dev
 # the program has only been tested at dev enviroment
@@ -173,21 +188,6 @@ at the root of the project
 <!-- PROJECT STATUS -->
 ## Project Status
 Project is: ___finished___
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
-
-## Room for Improvement
-Include areas you believe need improvement / could be improved. Also add TODOs for future development.
-
-Room for improvement:
-- Improvement to be done 1
-- Improvement to be done 2
-
-To do:
-- Feature to be added 1
-- Feature to be added 2
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
