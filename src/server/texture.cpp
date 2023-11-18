@@ -323,8 +323,8 @@ void sortResult(Result *a) {
 
 int main() { 
     cout << "running" << endl;
-    string fileName = "10.jpg";
-    // currently hardcoded
+    string fileName = "query.jpg";
+    // CHANGE THIS PATH
     string imgPath = "D:/Git_Repository/tubes2_algeo/src/server/uploads/" + fileName;
     string datasetPath = "uploads/dataset/";
 //    cout << datasetPath + fileName;

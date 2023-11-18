@@ -80,7 +80,6 @@ const dataUpload = multer({
   fileFilter: imageFilter,
 });
 
-/* API ACTIONS */
 app.post("/api/upload-img", ImgUpload.array("file"), async (req, res) => {
   // Check for the directory, if not found then create it
   try {
@@ -108,7 +107,7 @@ app.post("/api/upload-img", ImgUpload.array("file"), async (req, res) => {
       // Delete the image before the newly uploaded image
       if (existingImages.length > 0) {
         const imageToDelete = existingImages[0]; 
-        await fs.unlink(path.join(__dirname, "uploads", imageToDelete));
+        await fs.rm(path.join(__dirname, "uploads", imageToDelete));
       }
 
       // Insert the current image at the beginning of the list
@@ -116,6 +115,10 @@ app.post("/api/upload-img", ImgUpload.array("file"), async (req, res) => {
 
       // Store the updated list in the JSON file
       await fs.writeFile(uploadedImagesPath, JSON.stringify(existingImages));
+
+      // Create a duplicate of the uploaded image with the name 'query.jpg'
+      const queryImageDestination = path.join(__dirname, "uploads", "query.jpg");
+      await fs.copyFile(path.join(__dirname, "uploads", lastUploadedFileName), queryImageDestination);
     }
 
     res.json({ message: "File uploaded successfully" });
