@@ -20,7 +20,7 @@ export default function App() {
   const [toggleColorTexture, setToggleColorTexture] = useState<boolean>(false);
   const [toggleCamera, setToggleCamera] = useState<boolean>(true);
   const [toggleCapture, setToggleCapture] = useState<boolean>(false);
-  const [toggleAutoSearch, setToggleAutoSearch] = useState<boolean>(false);
+  const [toggleAutoSearch, setToggleAutoSearch] = useState<boolean>(true);
   const [havequery, setHavequery] = useState<boolean>(false);
   const [isSearching, setIsSeaching] = useState<boolean>(false);
   const [captureInterval, setCaptureInterval] = useState<number>(15);
@@ -376,9 +376,6 @@ export default function App() {
     };
     autoSearch();
 
-    const interavlAutoSearch = setInterval(autoSearch, captureInterval! * 1000);
-
-    return () => clearInterval(interavlAutoSearch);
   }, [toggleCapture, toggleAutoSearch, toggleColorTexture]);
 
   const sendScreenshot = async () => {

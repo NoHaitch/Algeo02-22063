@@ -22,7 +22,7 @@ export default function GetAllImgItems({ query }: { query: boolean }) {
 
   return (
     <section>
-      {imgCount > 0 && (
+      {imgCount > 0 ? (
         <div className="flex flex-row space-x-4 justify-center">
           <nav aria-label="Page navigation example">
             <ul className="flex items-center -space-x-px h-8 text-sm">
@@ -156,7 +156,8 @@ export default function GetAllImgItems({ query }: { query: boolean }) {
             </ul>
           </nav>
         </div>
-      )}
+      ) : <div className="font-bold text-center">Tidak ditemukan gambar dengan cosine similarity lebih besar dari 60%</div> 
+      }
       {imgCount > 0 && (
         <ImgItems start={startIndex} end={endIndex} query={query} />
       )}

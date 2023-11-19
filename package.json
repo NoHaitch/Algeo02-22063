@@ -10,7 +10,7 @@
     "dev-server": "cd src/server && nodemon server.js",
     "dev-client": "cd src/client && npm run dev",
     "build": "concurrently \"npm run build-client\" \"npm run build-server",
-    "build-server": "concurrently \"npm run build-server-texture\" \"npm run build-server-color\"", 
+    "build-server": "concurrently \"npm run build-server-texture\" \"npm run build-server-color\"",
     "build-client": "cd src/server && npm run build",
     "build-server-texture": "cd src/server && g++ texture.cpp -o textureSearch.exe",
     "build-server-color": "cd src/server && g++ color.cpp -o colorSearch.exe",
