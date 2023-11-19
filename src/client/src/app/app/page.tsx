@@ -5,7 +5,6 @@ import { useEffect, useRef, useState } from "react";
 import Webcam from "react-webcam";
 import { motion } from "framer-motion";
 import GetAllImgItems from "@/components/getAllImgItems";
-import { saveAs } from "file-saver";
 import DatasetNoquery from "../../../../server/uploads/dataset.json";
 import ImgQuery from "../../../../server/uploads/image.json";
 
@@ -21,10 +20,10 @@ export default function App() {
   const [toggleColorTexture, setToggleColorTexture] = useState<boolean>(false);
   const [toggleCamera, setToggleCamera] = useState<boolean>(true);
   const [toggleCapture, setToggleCapture] = useState<boolean>(false);
-  const [toggleAutoSearch, setToggleAutoSearch] = useState<boolean>(true);
+  const [toggleAutoSearch, setToggleAutoSearch] = useState<boolean>(false);
   const [havequery, setHavequery] = useState<boolean>(false);
   const [isSearching, setIsSeaching] = useState<boolean>(false);
-  const [captureInterval, setCaptureInterval] = useState<number>(5);
+  const [captureInterval, setCaptureInterval] = useState<number>(15);
   const [screenshot, setScreenshot] = useState<string | null>(null);
   const [webcamError, setWebcamError] = useState<boolean>(false);
   const [currentData, setData] = useState({
@@ -309,21 +308,31 @@ export default function App() {
 
   /* CAMERA */
   const handleCameraSearch = async () => {
-    setToggleCapture(false);
-    saveScreenshot();
+    sendScreenshot();
+    if (imgCount == 0) {
+      createDangerAlert("Dataset is empty. Please upload a dataset");
+    } else {
+      setIsSeaching(true);
+      setHavequery(true);
+      if (toggleColorTexture) {
+        // Color search
+        console.log("color search");
+        handleColorSearch();
+      } else {
+        // Texture search
+        console.log("texture search");
+        handleTextureSearch();
+      }
+    }
   };
 
   useEffect(() => {
     const captureScreenshot = async () => {
-      if (toggleCapture && webcamRef.current) {
+      if (toggleCapture && webcamRef.current && !isSearching) {
         try {
-          // Ensure that the webcam is accessible before attempting to capture
-          const base64 = webcamRef.current.getScreenshot();
+          const base64 = await webcamRef.current.getScreenshot();
           setScreenshot(base64);
           setWebcamError(false);
-
-          // Uncomment the line below to save the screenshot as a file
-          // saveScreenshot(base64);
         } catch (error) {
           // Handle webcam access error
           console.error("Error accessing webcam:", error);
@@ -335,32 +344,52 @@ export default function App() {
     // Capture a screenshot initially
     captureScreenshot();
 
-    // Set up interval to capture a screenshot every 5 seconds
     const intervalId = setInterval(captureScreenshot, captureInterval! * 1000);
 
-    // Cleanup interval on component unmount
     return () => clearInterval(intervalId);
+    //  }, [toggleCapture, screenshot]);
   }, [toggleCapture]);
 
-  const saveScreenshot = () => {
+  useEffect(() => {
+    if (!toggleAutoSearch) {
+      //handleCameraSearch();
+      sendScreenshot();
+      if (imgCount == 0) {
+        createDangerAlert("Dataset is empty. Please upload a dataset");
+      } else {
+        setIsSeaching(true);
+        setHavequery(true);
+        if (toggleColorTexture) {
+          // Color search
+          console.log("color search");
+          handleColorSearch();
+        } else {
+          // Texture search
+          console.log("texture search");
+          handleTextureSearch();
+        }
+      }
+    }
+  }, [screenshot]);
+
+  const sendScreenshot = async () => {
     if (screenshot) {
-      const blob = base64ToBlob(screenshot);
-      saveAs(blob, "delete_this.png");
-      console.log(screenshot);
+      try {
+        // Send the screenshot data to the server using fetch
+        await fetch("http://127.0.0.1:8080/api/upload-screenshot", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ screenshot: screenshot }),
+        });
+      } catch (error) {
+        createDangerAlert("Screenshot upload failed");
+        // Handle the error as needed
+      }
+    } else {
+      console.warn("No screenshot to send.");
     }
-  };
-
-  const base64ToBlob = (base64: string): Blob => {
-    const byteCharacters = atob(base64.split(",")[1]);
-    const byteNumbers = new Array(byteCharacters.length);
-
-    for (let i = 0; i < byteCharacters.length; i++) {
-      byteNumbers[i] = byteCharacters.charCodeAt(i);
-    }
-
-    const byteArray = new Uint8Array(byteNumbers);
-
-    return new Blob([byteArray], { type: "image/png" });
   };
 
   return (
@@ -410,7 +439,13 @@ export default function App() {
               Manual
             </h3>
             <div
-              onClick={() => setToggleCamera(!toggleCamera)}
+              onClick={() => {
+                setToggleCamera(!toggleCamera);
+                setToggleCapture(false);
+                if (currentImgShownRef.current) {
+                  currentImgShownRef.current.src = `http://localhost:8080/uploads/${currentData.image}`;
+                }
+              }}
               className={`flex h-7 w-14 cursor-pointer rounded-full border-2  border-[--primary] ${
                 toggleCamera
                   ? "justify-start bg-white"
@@ -566,7 +601,7 @@ export default function App() {
           ) : (
             <div className="flex flex-col items-center text-center">
               <div className="flex flex-col justify-center items-center font-bold space-y-2">
-                <div className="flex flex-row items-center"> 
+                <div className="flex flex-row items-center">
                   <div className="text-center text-slate-600 m-5">
                     <div className="">
                       <h2 className="text-center">Webcam</h2>
@@ -596,112 +631,109 @@ export default function App() {
               </div>
               <div className="flex flex-col items-center">
                 <div className="flex flex-col items-center space-y-4">
-                    <input
-                      type="file"
-                      ref={imgInputRef}
-                      className="hidden"
-                      id="imgInput"
-                      onChange={handleImgInputChange}
-                    />
-                    <input
-                      type="file"
-                      ref={datasetInputRef}
-                      // @ts-ignore
-                      directory=""
-                      webkitdirectory=""
-                      className="hidden"
-                      id="datasetInput"
-                      onChange={handleDatasetInputChange}
-                    />
-                    <div className="flex flex-col items-center space-y-2">
-                      <div className="flex flex-row">
-                        <div className="flex flex-col">
-                          <button
-                            onClick={openDatasetSelect}
-                            className="h-[50px] relative inline-flex items-center justify-center p-4 px-5 py-3 overflow-hidden font-medium text-indigo-600 transition duration-300 ease-out rounded-full shadow-xl group hover:ring-1 hover:ring-purple-500"
-                          >
-                            <span className="absolute inset-0 w-full h-full bg-gradient-to-br from-blue-600 via-purple-600 to-pink-700"></span>
-                            <span className="absolute bottom-0 right-0 block w-64 h-64 mb-32 mr-4 transition duration-500 origin-bottom-left transform rotate-45 translate-x-24 bg-pink-500 rounded-full opacity-30 group-hover:rotate-90 ease"></span>
-                            <span className="relative text-white">
-                              Select DataSet Folder
-                            </span>
-                          </button>
-                          <h1 className="text-center font-normal text-sm">
-                            {currentData.selectedDataset}
-                          </h1>
-                        </div>
+                  <input
+                    type="file"
+                    ref={imgInputRef}
+                    className="hidden"
+                    id="imgInput"
+                    onChange={handleImgInputChange}
+                  />
+                  <input
+                    type="file"
+                    ref={datasetInputRef}
+                    // @ts-ignore
+                    directory=""
+                    webkitdirectory=""
+                    className="hidden"
+                    id="datasetInput"
+                    onChange={handleDatasetInputChange}
+                  />
+                  <div className="flex flex-col items-center space-y-2">
+                    <div className="flex flex-row">
+                      <div className="flex flex-col">
                         <button
-                          onClick={handleDatasetUpload}
-                          className="ml-2 h-[50px] relative inline-flex items-center justify-center p-4 px-5 py-3 overflow-hidden font-medium text-indigo-600 transition duration-300 ease-out rounded-full shadow-xl group hover:ring-1 hover:ring-purple-500"
+                          onClick={openDatasetSelect}
+                          className="h-[50px] relative inline-flex items-center justify-center p-4 px-5 py-3 overflow-hidden font-medium text-indigo-600 transition duration-300 ease-out rounded-full shadow-xl group hover:ring-1 hover:ring-purple-500"
                         >
                           <span className="absolute inset-0 w-full h-full bg-gradient-to-br from-blue-600 via-purple-600 to-pink-700"></span>
                           <span className="absolute bottom-0 right-0 block w-64 h-64 mb-32 mr-4 transition duration-500 origin-bottom-left transform rotate-45 translate-x-24 bg-pink-500 rounded-full opacity-30 group-hover:rotate-90 ease"></span>
-                          <span className="relative text-white">Upload</span>
-                          <svg
-                            className="ml-2 w-5 h-5 z-[10]"
-                            fill="none"
-                            stroke="white"
-                            viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                              d="M14 5l7 7m0 0l-7 7m7-7H3"
-                            ></path>
-                          </svg>
+                          <span className="relative text-white">
+                            Select DataSet Folder
+                          </span>
                         </button>
+                        <h1 className="text-center font-normal text-sm">
+                          {currentData.selectedDataset}
+                        </h1>
                       </div>
-                    </div>
-                    <div className="-mr-5 text-l font-bold flex flex-row space-x-3 mt-5">
-                      <h3
-                        className={`${
-                          toggleColorTexture ? "text-[--primary]" : ""
-                        }`}
+                      <button
+                        onClick={handleDatasetUpload}
+                        className="ml-2 h-[50px] relative inline-flex items-center justify-center p-4 px-5 py-3 overflow-hidden font-medium text-indigo-600 transition duration-300 ease-out rounded-full shadow-xl group hover:ring-1 hover:ring-purple-500"
                       >
-                        Color
-                      </h3>
-
-                      <div
-                        onClick={() =>
-                          setToggleColorTexture(!toggleColorTexture)
-                        }
-                        className={`flex h-7 w-14 cursor-pointer rounded-full border-2  border-[--primary] ${
-                          toggleColorTexture
-                            ? "justify-start bg-white"
-                            : "justify-end bg-[--primary]"
-                        } p-[2px] `}
-                      >
-                        <motion.div
-                          className={`h-5 w-5 rounded-full ${
-                            toggleColorTexture ? "bg-[--primary]" : "bg-white"
-                          }`}
-                          layout
-                          transition={{
-                            type: "spring",
-                            stiffness: 700,
-                            damping: 30,
-                          }}
-                        />
-                      </div>
-                      <h3
-                        className={`${
-                          !toggleColorTexture ? "text-[--primary]" : ""
-                        }`}
-                      >
-                        Texture
-                      </h3>
+                        <span className="absolute inset-0 w-full h-full bg-gradient-to-br from-blue-600 via-purple-600 to-pink-700"></span>
+                        <span className="absolute bottom-0 right-0 block w-64 h-64 mb-32 mr-4 transition duration-500 origin-bottom-left transform rotate-45 translate-x-24 bg-pink-500 rounded-full opacity-30 group-hover:rotate-90 ease"></span>
+                        <span className="relative text-white">Upload</span>
+                        <svg
+                          className="ml-2 w-5 h-5 z-[10]"
+                          fill="none"
+                          stroke="white"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M14 5l7 7m0 0l-7 7m7-7H3"
+                          ></path>
+                        </svg>
+                      </button>
                     </div>
                   </div>
+                  <div className="-mr-5 text-l font-bold flex flex-row space-x-3 mt-5">
+                    <h3
+                      className={`${
+                        toggleColorTexture ? "text-[--primary]" : ""
+                      }`}
+                    >
+                      Color
+                    </h3>
+
+                    <div
+                      onClick={() => setToggleColorTexture(!toggleColorTexture)}
+                      className={`flex h-7 w-14 cursor-pointer rounded-full border-2  border-[--primary] ${
+                        toggleColorTexture
+                          ? "justify-start bg-white"
+                          : "justify-end bg-[--primary]"
+                      } p-[2px] `}
+                    >
+                      <motion.div
+                        className={`h-5 w-5 rounded-full ${
+                          toggleColorTexture ? "bg-[--primary]" : "bg-white"
+                        }`}
+                        layout
+                        transition={{
+                          type: "spring",
+                          stiffness: 700,
+                          damping: 30,
+                        }}
+                      />
+                    </div>
+                    <h3
+                      className={`${
+                        !toggleColorTexture ? "text-[--primary]" : ""
+                      }`}
+                    >
+                      Texture
+                    </h3>
+                  </div>
+                </div>
                 <div className="flex flex-col items-center">
                   <div className="flex flex-row m-2 text-center justify-center items-center">
                     <h1>Capture Interval</h1>
                     <input
                       type="number"
                       step="0.2"
-                      min="4"
-                      max="20"
+                      min="10"
                       disabled={toggleCapture}
                       value={captureInterval}
                       className={`m-2 border-2 border-black w-[64px] text-center ${
@@ -810,7 +842,7 @@ export default function App() {
         <span className="m-4 h-0.5 w-full bg-[--secondary] divider"></span>
         <div
           id="success-alert"
-          className="absolute z-[10] top-0 mt-5 flex items-center p-4 mb-4 rounded-lg bg-gray-800 text-green-400 drop-shadow-2xl"
+          className="fixed z-[10] top-0 mt-5 flex items-center p-4 mb-4 rounded-lg bg-gray-800 text-green-400 drop-shadow-2xl"
           role="alert"
           style={{ display: "none" }}
         >
@@ -853,7 +885,7 @@ export default function App() {
         </div>
         <div
           id="danger-alert"
-          className="absolute z-[10] top-0 mt-5 flex items-center p-4 mb-4 bg-gray-800 text-red-400 rounded-lg"
+          className="fixed z-[10] top-0 mt-5 flex items-center p-4 mb-4 bg-gray-800 text-red-400 rounded-lg"
           role="alert"
           style={{ display: "none" }}
         >
@@ -906,7 +938,7 @@ export default function App() {
         (!isSearching ? (
           <GetAllImgItems query={havequery} />
         ) : (
-          <div role="status">
+          <div role="status" className="">
             <div className="top-0 left-0 flex flex-col justify-center items-center z-[10] ">
               <div role="status">
                 <svg
