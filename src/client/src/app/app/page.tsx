@@ -379,7 +379,7 @@ export default function App() {
     const interavlAutoSearch = setInterval(autoSearch, captureInterval! * 1000);
 
     return () => clearInterval(interavlAutoSearch);
-  }, [screenshot, toggleCapture]);
+  }, [toggleCapture, toggleAutoSearch, toggleColorTexture]);
 
   const sendScreenshot = async () => {
     if (screenshot) {
