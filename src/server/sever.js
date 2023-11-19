@@ -154,7 +154,19 @@ app.post("/api/upload-data", dataUpload.array("file"), async (req, res) => {
   }
   
   try{
-    await fs.rm(path.join(__dirname, "cache.json"));
+    await fs.rm(path.join(__dirname, "cache1.json"));
+  } catch(error){
+  }
+  try{
+    await fs.rm(path.join(__dirname, "cache2.json"));
+  } catch(error){
+  }
+  try{
+    await fs.rm(path.join(__dirname, "cache3.json"));
+  } catch(error){
+  }
+  try{
+    await fs.rm(path.join(__dirname, "cache4.json"));
   } catch(error){
   }
 
