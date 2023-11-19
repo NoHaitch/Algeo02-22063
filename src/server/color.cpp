@@ -494,6 +494,7 @@ long long searchColor(const string& pathImageInserted, const string& pathDataset
 }
 
 int main() { 
-    int w = searchColor("D:/Python/tubes2_algeo/src/server/uploads/query.jpg", "uploads/dataset/");
+    // CHANGE THIS PATH
+    int w = searchColor("path/to/your/uploads/query.jpg", "uploads/dataset/");
     return 0;
 }
