@@ -130,8 +130,8 @@ export default function Introduction() {
               perbandingan teksture, warna sudah tidak diperlukan bahkan
               memperlambat proses. Dari gambar ini, dengan menggunakan{" "}
               <span className="italic font-bold">co-occurrence matrix</span>,
-              kita dapat mendapatkan 3 komponen dari gambar, yaitu Contrast,
-              Homogeneity, dan Entropy. Komponen-komponen ini dapat digunakan
+              kita dapat mendapatkan 6 komponen dari gambar, yaitu Contrast,
+              Homogeneity, Entropy, Dissimilarity, Energy, dan Correlation. Komponen-komponen ini dapat digunakan
               dalam <span className="italic font-bold"> cosine similarity</span>{" "}
               sama seperti pada mode color. Dengan semakin besar nilainya maka
               semakin cocok 2 buah gambar dan sebaliknya semakin kecil maka
