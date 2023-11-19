@@ -156,7 +156,7 @@ export default function GetAllImgItems({ query }: { query: boolean }) {
             </ul>
           </nav>
         </div>
-      ) : <div className="font-bold text-center">Tidak ditemukan gambar dengan cosine similarity lebih besar dari 60%</div> 
+      ) : (DatasetQuery.length != 0 ? <div className="font-bold text-center">Tidak ditemukan gambar dengan cosine similarity lebih besar dari 60%</div> : "")
       }
       {imgCount > 0 && (
         <ImgItems start={startIndex} end={endIndex} query={query} />
