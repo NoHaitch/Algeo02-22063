@@ -108,7 +108,6 @@ Phoenix Image a Content-Based Image Retrieval System made by Bjir Anak Nopal. Th
 
 ### Other
 - concurrently v8.2.2
-- file-saver v2.0.5
 - nodemon v3.0.1
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -118,8 +117,11 @@ Phoenix Image a Content-Based Image Retrieval System made by Bjir Anak Nopal. Th
 <!-- FEATURES -->
 ## Features
 ### 1. Search using Color Data
+  - stores cache
 ### 2. Search using Texture Data
-### 3. Search from Web camera 
+### 3. Search using Web camera
+  1. Manualy
+  2. Automaticly
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
