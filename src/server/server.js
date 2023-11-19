@@ -45,7 +45,6 @@ const imageFilter = (req, file, cb) => {
     cb(new Error("Invalid file type. Only images are allowed."), false); // Reject the file
   }
 };
-
 /* MULTER */
 const imgStorage = multer.diskStorage({
   destination: function (req, file, callback) {
@@ -152,23 +151,19 @@ app.post("/api/upload-data", dataUpload.array("file"), async (req, res) => {
     // The file doesn't exist, create it with an empty array
     await fs.writeFile(DATA_FILE_PATH2, "[]");
   }
-  
-  try{
+
+  try {
     await fs.rm(path.join(__dirname, "cache1.json"));
-  } catch(error){
-  }
-  try{
+  } catch (error) {}
+  try {
     await fs.rm(path.join(__dirname, "cache2.json"));
-  } catch(error){
-  }
-  try{
+  } catch (error) {}
+  try {
     await fs.rm(path.join(__dirname, "cache3.json"));
-  } catch(error){
-  }
-  try{
+  } catch (error) {}
+  try {
     await fs.rm(path.join(__dirname, "cache4.json"));
-  } catch(error){
-  }
+  } catch (error) {}
 
   try {
     const uploadedDatasetPath = path.join(
@@ -189,7 +184,7 @@ app.post("/api/upload-data", dataUpload.array("file"), async (req, res) => {
 
     // Store the updated list in the dataset JSON file
     await fs.writeFile(uploadedDatasetPath, JSON.stringify(existingDataset));
-  
+
     res.json({ mesnsage: "Files uploaded successfully" });
   } catch (error) {
     console.error(error);
