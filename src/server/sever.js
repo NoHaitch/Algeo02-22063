@@ -152,6 +152,12 @@ app.post("/api/upload-data", dataUpload.array("file"), async (req, res) => {
     // The file doesn't exist, create it with an empty array
     await fs.writeFile(DATA_FILE_PATH2, "[]");
   }
+  
+  try{
+    await fs.rm(path.join(__dirname, "cache.json"));
+  } catch(error){
+  }
+
   try {
     const uploadedDatasetPath = path.join(
       __dirname,
@@ -171,7 +177,7 @@ app.post("/api/upload-data", dataUpload.array("file"), async (req, res) => {
 
     // Store the updated list in the dataset JSON file
     await fs.writeFile(uploadedDatasetPath, JSON.stringify(existingDataset));
-
+  
     res.json({ mesnsage: "Files uploaded successfully" });
   } catch (error) {
     console.error(error);

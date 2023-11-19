@@ -351,26 +351,35 @@ export default function App() {
   }, [toggleCapture]);
 
   useEffect(() => {
-    if (!toggleAutoSearch) {
-      //handleCameraSearch();
-      sendScreenshot();
-      if (imgCount == 0) {
-        createDangerAlert("Dataset is empty. Please upload a dataset");
-      } else {
-        setIsSeaching(true);
-        setHavequery(true);
-        if (toggleColorTexture) {
-          // Color search
-          console.log("color search");
-          handleColorSearch();
-        } else {
-          // Texture search
-          console.log("texture search");
-          handleTextureSearch();
+    const autoSearch = async () => {
+      if (!toggleCamera && toggleCapture) {
+        if (!toggleAutoSearch) {
+          //handleCameraSearch();
+          sendScreenshot();
+          if (imgCount == 0) {
+            createDangerAlert("Dataset is empty. Please upload a dataset");
+          } else {
+            setIsSeaching(true);
+            setHavequery(true);
+            if (toggleColorTexture) {
+              // Color search
+              console.log("color search");
+              handleColorSearch();
+            } else {
+              // Texture search
+              console.log("texture search");
+              handleTextureSearch();
+            }
+          }
         }
       }
-    }
-  }, [screenshot]);
+    };
+    autoSearch();
+
+    const interavlAutoSearch = setInterval(autoSearch, captureInterval! * 1000);
+
+    return () => clearInterval(interavlAutoSearch);
+  }, [screenshot, toggleCapture]);
 
   const sendScreenshot = async () => {
     if (screenshot) {
@@ -442,7 +451,7 @@ export default function App() {
               onClick={() => {
                 setToggleCamera(!toggleCamera);
                 setToggleCapture(false);
-                if (currentImgShownRef.current) {
+                if (currentImgShownRef.current && currentData.image != "") {
                   currentImgShownRef.current.src = `http://localhost:8080/uploads/${currentData.image}`;
                 }
               }}
