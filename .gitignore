@@ -44,3 +44,8 @@ src/server/uploads/tempdataset.json
 src/server/uploads/*.jpg 
 src/server/uploads/*.jpeg 
 src/server/uploads/*.png
+src/server/cache1.json
+src/server/cache2.json
+src/server/cache3.json
+src/server/cache4.json
+src/server/*.exe
