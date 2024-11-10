@@ -4,9 +4,10 @@
 
 <br />
 <div align="center">
-  <h1 align="center">Tugas Besar IF2110 Algoritma & Struktur Data ITB</h1>
+  <h1 align="center">Phoenix Image</h1>
 
   <p align="center">
+    <h3>Tugas Besar IF2110 Algoritma & Struktur Data ITB</h3>
     <h3>Content-Based Image Retrieval System (CBIR)</h3>
     <h3>Demo? Clone this!</h3>
     <br>
